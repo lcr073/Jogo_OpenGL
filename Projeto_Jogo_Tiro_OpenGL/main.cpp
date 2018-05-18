@@ -13,6 +13,8 @@
  */
 
 #include <windows.h>
+#include <gl/glu.h>
+#include <math.h>
 #ifdef __APPLE__
 #include <GLUT/glut.h>
 #else
@@ -21,8 +23,157 @@
 
 #include <stdlib.h>
 
-static int slices = 16;
-static int stacks = 16;
+// Angulo
+float angle=0.0;
+// actual vector representing the camera's direction
+float lx=0.0f,lz=-1.0f;
+// XZ position of the camera
+float x=0.0f,z=2.0f;
+
+void face(){
+                float di = 1.0/20.0;
+
+                float i = 0.5;
+                float u = 0.5;
+
+
+                glBegin(GL_QUADS);
+                while(i >= (-0.5)){
+                        while(u >= (-0.5)){
+               //             glColor3f(u,i,0);
+                            glVertex3f(0.5,i,u);
+                            glNormal3f(1,0,0);
+
+                            glVertex3f(0.5,i-di,u);
+
+                            glVertex3f(0.5,i-di,u-di);
+
+                            glVertex3f(0.5,i,u-di);
+                            u = u - di;
+                        }
+                            u = 0.5;
+                            i = i - di;
+                }
+                 glEnd();
+
+
+                glPushMatrix();
+                glRotated(90.0,0,0,1);
+                glPopMatrix();
+}
+
+void chao(){
+    glColor3f(1,0,0);
+                float di = 1.0/5.0;
+
+                float i = 40.0;
+                float u = 40.0;
+
+                glRotatef(-90,0.0f,1.0f,0.0f);
+
+                glPushMatrix();
+
+                    glBegin(GL_QUADS);
+                    while(i >= (-40.0)){
+                            while(u >= (-40.0)){
+                                glVertex3f(0.5,i,u);
+                                glNormal3f(1,0,0);
+
+                                glVertex3f(0.5,i-di,u);
+
+                                glVertex3f(0.5,i-di,u-di);
+
+                                glVertex3f(0.5,i,u-di);
+
+                                u = u - di;
+                            }
+                                u = 40;
+                                i = i - di;
+                    }
+                     glEnd();
+                glPopMatrix();
+}
+
+
+void desenhaCubo(){
+            glColor3d(1,0,1);
+                face();
+
+            glPushMatrix();
+                glColor3d(1,0,0);
+                glRotated(90.0,0,0,1);
+                face();
+            glPopMatrix();
+
+            glPushMatrix();
+                glColor3d(0,1,0);
+                glRotated(180.0,0,0,1);
+                face();
+            glPopMatrix();
+
+            glPushMatrix();
+                glColor3d(1,1,0);
+                glRotated(270.0,0,0,1);
+                face();
+            glPopMatrix();
+
+            glPushMatrix();
+                glColor3d(0,1,0);
+                glRotated(90,0,1,0);
+                face();
+            glPopMatrix();
+
+            glPushMatrix();
+                glColor3d(0,1,1);
+                glRotated(-90,0,1,0);
+                face();
+            glPopMatrix();
+}
+
+void eixos(float T)
+{
+    glBegin(GL_LINES);
+
+    glColor3f(1,0,0);
+
+    glVertex3f(0,0,0);
+    glVertex3f(T,0,0);
+
+    glColor3f(0,1,0);
+
+    glVertex3f(0,0,0);
+    glVertex3f(0,T,0);
+
+    glColor3f(0,0,1);
+
+    glVertex3f(0,0,0);
+    glVertex3f(0,0,T);
+
+    glEnd();
+};
+
+void BaseCirculo(){
+    float umin = 0;
+    float umax = 360;
+    float du = (umax-umin)/32;
+      // float du = 4 * M_PI / 180;
+    float i;
+    i = umin;
+
+    // Definindo as dimensos do cubo
+    //glScaled(1.0,2.0,4.0);
+
+    while(i <= umax){
+            glPushMatrix();
+                glRotated(i,0,0,1);
+                glTranslated(16,0,2.0);
+            glScalef(1,1,4);
+
+                desenhaCubo();
+            glPopMatrix();
+        i = i + du;
+    }
+}
 
 /* GLUT callback Handlers */
 
@@ -31,88 +182,101 @@ static void resize(int width, int height)
     const float ar = (float) width / (float) height;
 
     glViewport(0, 0, width, height);
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    glFrustum(-ar, ar, -1.0, 1.0, 2.0, 100.0);
 
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity() ;
+  //  glFrustum(-ar, ar, -1.0, 1.0, 2.0, 100.0);
 }
 
 static void display(void)
 {
-    const double t = glutGet(GLUT_ELAPSED_TIME) / 1000.0;
-    const double a = t*90.0;
-
+    glClearColor(1,1,1,1);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glColor3d(1,0,0);
+    glEnable(GL_DEPTH_TEST);
 
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+
+
+     glOrtho(-30.0, 30.0, -30.0, 30.0, -1000.0, 1000.0);
+//     gluLookAt(1.0,0.0,0.7,0.0,0.0,0.5,0.0,0.0,1.0);
+
+
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+
+
+    //roda o mundo
+ //   glPushMatrix();
+
+    //roda o cubinho
     glPushMatrix();
-        glTranslated(-2.4,1.2,-6);
-        glRotated(60,1,0,0);
-        glRotated(a,0,0,1);
-        glutSolidSphere(1,slices,stacks);
+//    glTranslatef(w,e,0);
+//    glRotatef(q,0.0f,0.0f,1.0f);
+
+    desenhaCubo();
+
     glPopMatrix();
 
-    glPushMatrix();
-        glTranslated(0,1.2,-6);
-        glRotated(60,1,0,0);
-        glRotated(a,0,0,1);
-        glutSolidCone(1,1,slices,stacks);
+	gluLookAt(	x, z, 0.4f,x+lx, z+lz,0.0f,0.0f, 0.0f,1.0f);
+        glPushMatrix();
+
+
+
+        BaseCirculo();
+
+       // chao();
+
+
+
+  //  eixos(10.0);
+
+
+
+    //termina de rodar o mundo
     glPopMatrix();
 
-    glPushMatrix();
-        glTranslated(2.4,1.2,-6);
-        glRotated(60,1,0,0);
-        glRotated(a,0,0,1);
-        glutSolidTorus(0.2,0.8,slices,stacks);
-    glPopMatrix();
-
-    glPushMatrix();
-        glTranslated(-2.4,-1.2,-6);
-        glRotated(60,1,0,0);
-        glRotated(a,0,0,1);
-        glutWireSphere(1,slices,stacks);
-    glPopMatrix();
-
-    glPushMatrix();
-        glTranslated(0,-1.2,-6);
-        glRotated(60,1,0,0);
-        glRotated(a,0,0,1);
-        glutWireCone(1,1,slices,stacks);
-    glPopMatrix();
-
-    glPushMatrix();
-        glTranslated(2.4,-1.2,-6);
-        glRotated(60,1,0,0);
-        glRotated(a,0,0,1);
-        glutWireTorus(0.2,0.8,slices,stacks);
-    glPopMatrix();
 
     glutSwapBuffers();
 }
 
 
-static void key(unsigned char key, int x, int y)
+static void key(unsigned char key, int xx, int yy)
 {
     switch (key)
     {
         case 27 :
-        case 'q':
+
+		case 'd' :
+			angle -= 0.01f;
+			lx = sin(angle);
+			lz = -cos(angle);
+			break;
+		case 'a' :
+			angle += 0.01f;
+			lx = sin(angle);
+			lz = -cos(angle);
+			break;
+		case 'w' :
+			x += lx ;
+			z += lz ;
+			break;
+		case 's' :
+			x -= lx;
+			z -= lz;
+			break;
+
+        case 'p':
             exit(0);
             break;
 
         case '+':
-            slices++;
-            stacks++;
+            break;
+
+        case 'x':
+
             break;
 
         case '-':
-            if (slices>3 && stacks>3)
-            {
-                slices--;
-                stacks--;
-            }
+
             break;
     }
 
@@ -143,9 +307,10 @@ int main(int argc, char *argv[])
     glutInitWindowPosition(10,10);
     glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH);
 
-    glutCreateWindow("GLUT Shapes");
+    glutCreateWindow("Jogo de Tiro");
 
     glutReshapeFunc(resize);
+
     glutDisplayFunc(display);
     glutKeyboardFunc(key);
     glutIdleFunc(idle);
@@ -171,6 +336,7 @@ int main(int argc, char *argv[])
     glMaterialfv(GL_FRONT, GL_DIFFUSE,   mat_diffuse);
     glMaterialfv(GL_FRONT, GL_SPECULAR,  mat_specular);
     glMaterialfv(GL_FRONT, GL_SHININESS, high_shininess);
+
 
     glutMainLoop();
 
