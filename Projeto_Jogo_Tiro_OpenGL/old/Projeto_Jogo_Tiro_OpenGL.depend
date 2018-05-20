@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1526645347 source:c:\users\lcr07\google drive\maua\5ano\computação grafica\projetofinal_opengl\jogo_opengl\projeto_jogo_tiro_opengl\main.cpp
+1526581581 source:c:\users\lcr07\google drive\maua\5ano\computação grafica\projetofinal_opengl\jogo_opengl\projeto_jogo_tiro_opengl\main.cpp
 	<windows.h>
 	<gl/glu.h>
 	<math.h>
@@ -224,12 +224,4 @@
 
 1341006774 c:\program files (x86)\codeblocks\mingw\include\math.h
 	<_mingw.h>
-
-1526611813 source:c:\users\lcr07\downloads\projetofinal_opengl\projetofinal_opengl\jogo_opengl\projeto_jogo_tiro_opengl\main.cpp
-	<windows.h>
-	<gl/glu.h>
-	<math.h>
-	<GLUT/glut.h>
-	<GL/glut.h>
-	<stdlib.h>
 

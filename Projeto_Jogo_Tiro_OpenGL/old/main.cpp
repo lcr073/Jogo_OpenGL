@@ -23,16 +23,11 @@
 
 #include <stdlib.h>
 
-// Angulo
-float angle=0.0;
-// actual vector representing the camera's direction
-float lx=0.0f,lz=-1.0f;
-// XZ position of the camera
-float x=0.0f,z=2.0f;
-
-// Variavel que indica se tem balas ainda não eliminadas
-int qtdTiros = 5;
-
+float speed = 0.7f;
+float q = 0.0f;
+float w = 0.0f;
+float e = 0.0f;
+bool rotMundo = false;
 
 void face(){
                 float di = 1.0/20.0;
@@ -134,13 +129,6 @@ void desenhaCubo(){
             glPopMatrix();
 }
 
-void atira(){
-    glPushMatrix();
-    glTranslatef(x,(z-2),0.0);
-    desenhaCubo();
-    glPopMatrix();
-}
-
 void eixos(float T)
 {
     glBegin(GL_LINES);
@@ -206,20 +194,75 @@ static void display(void)
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
 
-     glOrtho(-4.0, 4.0, -4.0, 4.0, -1000.0, 1000.0);
-//     gluLookAt(1.0,0.0,0.7,0.0,0.0,0.5,0.0,0.0,1.0);
+
+     glOrtho(-30.0, 30.0, -30.0, 30.0, -1000.0, 1000.0);
+     gluLookAt(1.0,0.0,0.7,0.0,0.0,0.5,0.0,0.0,1.0);
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
+
+    //roda o mundo
+ //   glPushMatrix();
+
+    //roda o cubinho
+    glPushMatrix();
+//    glTranslatef(w,e,0);
+//    glRotatef(q,0.0f,0.0f,1.0f);
+
     desenhaCubo();
+    glPopMatrix();
+
+    //glRotatef(q,0.0f,0.0f,1.0f);
+    //glTranslatef(w*sin(q),w*cos(q),0.0f);
 
 
-	gluLookAt(	x, z, 0.4f,x+lx, z+lz,0.0f,0.0f, 0.0f,1.0f);
+ //   glTranslatef(w*sin(q),w*cos(q),0.0f);
+    //glRotatef(q,0.0f,0.0f,1.0f);
+
+
         glPushMatrix();
+
+    //glTranslatef(w,e,0);
+    //glTranslatef(w*cos(q),w*sin(q),0.0f);
+    //glRotated(q,0,0,1);
+    //glTranslatef(-w*cos(q),-w*sin(q),0.0f);
+
+
+
+ //  if(rotMundo == true){
+    // Rotacionando o mapa em relação ao novo Pivo
+        // Deixar o ponto de pivo na origem do sistema (0,0)
+        glTranslatef(-w,-e,0.0);
+
+        // Rotaciona o objeto
+        glRotated(q,0,0,1);
+
+        // Retorna a posição inicial o objeto ja rotacionado
+        glTranslatef(w,e,0.0);
+
         BaseCirculo();
 
+
+        // Rotaciona em relação ao eixo
+
+
+   //     rotMundo = false;
+  // }
+
+
+   // glTranslatef(w*cos(q),w*sin(q),0.0f);
+    //glTranslatef(w*sin(q),w*cos(q),0.0f);
+
+    //glRotatef(q,0.0f,0.0f,1.0f);
+
+
        // chao();
+
+   // glTranslatef(w*sin(q),w*cos(q),0.0f);
+
+    //glRotatef(q/1.0f,0.0f,0.0f,0.01f);
+
 
   //  eixos(10.0);
 
@@ -233,45 +276,42 @@ static void display(void)
 }
 
 
-static void key(unsigned char key, int xx, int yy)
+static void key(unsigned char key, int x, int y)
 {
     switch (key)
     {
         case 27 :
-
-            case 'k' :
-                // Permite atirar se tiver municao
-                if(qtdTiros > 0){
-                    atira();
-                    qtdTiros = qtdTiros - 1;
-                }
-
-        break;
-
-		case 'd' :
-			angle -= 0.01f;
-			lx = sin(angle);
-			lz = -cos(angle);
-			break;
-		case 'a' :
-			angle += 0.01f;
-			lx = sin(angle);
-			lz = -cos(angle);
-			break;
-		case 'w' :
-			x += lx ;
-			z += lz ;
-			break;
-		case 's' :
-			x -= lx;
-			z -= lz;
-			break;
-
         case 'p':
             exit(0);
             break;
 
         case '+':
+            break;
+
+        case 'q':
+            q = q + 1.0f;
+            rotMundo = true;
+            break;
+
+        case 'a':
+            q = q - 1.0f;
+            rotMundo = true;
+            break;
+
+        case 'w':
+            w = w + 1.0f;
+            break;
+
+        case 's':
+            w = w - 1.0f;
+            break;
+
+        case 'e':
+            e = e + 1.0f;
+            break;
+
+        case 'd':
+            e = e - 1.0f;
             break;
 
         case 'x':
