@@ -217,7 +217,7 @@
 
 1301111164 c:\program files (x86)\codeblocks\mingw\include\gl\gl.h
 
-1526315263 c:\program files (x86)\codeblocks\mingw\include\gl\glut.h
+1526232605 c:\program files (x86)\codeblocks\mingw\include\gl\glut.h
 	<windows.h>
 	<GL/gl.h>
 	<GL/glu.h>
@@ -225,11 +225,30 @@
 1341006774 c:\program files (x86)\codeblocks\mingw\include\math.h
 	<_mingw.h>
 
-1526611813 source:c:\users\lcr07\downloads\projetofinal_opengl\projetofinal_opengl\jogo_opengl\projeto_jogo_tiro_opengl\main.cpp
+1526844461 source:c:\users\lcr07\downloads\projetofinal_opengl\projetofinal_opengl\jogo_opengl\projeto_jogo_tiro_opengl\main.cpp
+	<stdio.h>
+	<stdlib.h>
+	"readBMP.h"
 	<windows.h>
 	<gl/glu.h>
 	<math.h>
 	<GLUT/glut.h>
 	<GL/glut.h>
+
+1526840052 source:c:\users\lcr07\downloads\projetofinal_opengl\projetofinal_opengl\jogo_opengl\projeto_jogo_tiro_opengl\readbmp.c
+	<stdio.h>
 	<stdlib.h>
+	"readBMP.h"
+
+1341006776 c:\program files (x86)\codeblocks\mingw\include\stdio.h
+	<_mingw.h>
+	<stddef.h>
+	<stdarg.h>
+	<sys/types.h>
+
+1341006780 c:\program files (x86)\codeblocks\mingw\include\sys\types.h
+	<_mingw.h>
+	<stddef.h>
+
+1526840054 c:\users\lcr07\downloads\projetofinal_opengl\projetofinal_opengl\jogo_opengl\projeto_jogo_tiro_opengl\readbmp.h
 

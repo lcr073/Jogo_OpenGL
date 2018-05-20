@@ -11,7 +11,9 @@
  * number of geometry stacks and slices can be adjusted
  * using the + and - keys.
  */
-
+#include <stdio.h>
+#include <stdlib.h>
+#include "readBMP.h" // para textura
 #include <windows.h>
 #include <gl/glu.h>
 #include <math.h>
@@ -21,7 +23,7 @@
 #include <GL/glut.h>
 #endif
 
-#include <stdlib.h>
+
 
 // Angulo
 float angle=0.0;
@@ -32,6 +34,59 @@ float x=0.0f,z=2.0f;
 
 // Variavel que indica se tem balas ainda não eliminadas
 int qtdTiros = 5;
+
+GLuint texture;
+
+// Limpando a textura da memoria
+void FreeTexture( GLuint texture )
+{
+  glDeleteTextures( 1, &texture );  //Delete our texture, simple enough.
+}
+
+void square (void) {
+    glBindTexture( GL_TEXTURE_2D, texture ); //bind our texture to our shape
+    glRotatef( angle, 1.0f, 1.0f, 1.0f );
+    glBegin (GL_QUADS);
+    glTexCoord2d(0.0,0.0); glVertex2d(-1.0,-1.0); //with our vertices we have to assign a texcoord
+    glTexCoord2d(1.0,0.0); glVertex2d(+1.0,-1.0); //so that our texture has some points to draw to
+    glTexCoord2d(1.0,1.0); glVertex2d(+1.0,+1.0);
+    glTexCoord2d(0.0,1.0); glVertex2d(-1.0,+1.0);
+    glEnd();
+}
+
+GLuint LoadTexture( const char * filename, int width, int height )
+{
+    GLuint texture;
+    unsigned char * data;
+    FILE * file;
+
+    // Abrindo arquivo
+    file = fopen(filename, "rb" );  //We need to open our file
+    if ( file == NULL ) return 0;  //If our file is empty, set our texture to empty
+    data = (unsigned char *)malloc( width * height * 3 ); // assign the nessecary memory for the texture
+
+    fread( data, width * height * 3, 1, file );  //read in our file
+    fclose( file ); //close our file, no point leaving it open
+
+    glGenTextures( 1, &texture ); // then we need to tell OpenGL that we are generating a texture primeiro parametro é o numero de texturas que
+                                    // queremos e o segundo e um ponteiro para onde ele ira salvar
+    glBindTexture( GL_TEXTURE_2D, texture ); //now we bind the texture that we are working with
+//    glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE ); // set texture environment parameters
+
+    glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+    glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+
+    glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
+    glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+
+    free( data ); //free the texture
+
+    return texture; //return the texture data
+
+}
+
 
 
 void face(){
@@ -209,8 +264,10 @@ static void display(void)
      glOrtho(-4.0, 4.0, -4.0, 4.0, -1000.0, 1000.0);
 //     gluLookAt(1.0,0.0,0.7,0.0,0.0,0.5,0.0,0.0,1.0);
 
+
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
+
 
     desenhaCubo();
 
@@ -219,6 +276,8 @@ static void display(void)
         glPushMatrix();
         BaseCirculo();
 
+    glEnable(GL_TEXTURE_2D);
+    square();
        // chao();
 
   //  eixos(10.0);
@@ -340,8 +399,11 @@ int main(int argc, char *argv[])
     glMaterialfv(GL_FRONT, GL_SPECULAR,  mat_specular);
     glMaterialfv(GL_FRONT, GL_SHININESS, high_shininess);
 
+    texture = LoadTexture("texture.raw",256,256);
 
     glutMainLoop();
+
+    FreeTexture( texture );
 
     return EXIT_SUCCESS;
 }
