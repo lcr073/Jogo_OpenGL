@@ -37,140 +37,61 @@ int qtdTiros = 5;
 
 GLuint texture;
 
-//Checkerboard texture
-GLuint mTextureID = 0;
-GLsizei mTextureWidth;
-GLsizei mTextureHeight;
-
-
-
 // Limpando a textura da memoria
-
-// Limpando oque esta na referencia
-void freeTexture()
-{
-    //Delete texture
-    if( mTextureID != 0 )
-    {
-        glDeleteTextures( 1, &mTextureID );
-        mTextureID = 0;
-    }
-
-    mTextureWidth = 0;
-    mTextureHeight = 0;
-}
-
-// Limpando tendo o id da textura
 void FreeTexture( GLuint texture )
 {
   glDeleteTextures( 1, &texture );  //Delete our texture, simple enough.
 }
 
-// Realiza os pedidos para o openGL de gerar um ID e vincula uma fonte de pixeis de dados nesse ID
-bool loadTextureFromPixels32( GLuint* pixels, GLuint width, GLuint height )
+
+GLuint LoadTexture( const char * filename, int width, int height )
 {
-    //Free texture if it exists
-    freeTexture();
+    GLuint texture;
+    unsigned char * data;
+    FILE * file;
 
-    //Get texture dimensions
-    mTextureWidth = width;
-    mTextureHeight = height;
+    // Abrindo arquivo
+    file = fopen(filename, "rb" );  //We need to open our file
+    if ( file == NULL ) return 0;  //If our file is empty, set our texture to empty
+ //   data = (unsigned char *)malloc( width * height * 3 ); // assign the nessecary memory for the texture
 
-    //Generate texture ID
-    glGenTextures( 1, &mTextureID );
+//    fread( data, width * height * 3, 1, file );  //read in our file
+    fclose( file ); //close our file, no point leaving it open
 
-    //Bind texture ID
-    glBindTexture( GL_TEXTURE_2D, mTextureID );
+    data = (unsigned char *)malloc(3);
+    data[3] = {0,0,1}
 
-    //Generate texture
-    glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels );
+    glGenTextures( 1, &texture ); // then we need to tell OpenGL that we are generating a texture primeiro parametro é o numero de texturas que
+                                    // queremos e o segundo e um ponteiro para onde ele ira salvar
+    glBindTexture( GL_TEXTURE_2D, texture ); //now we bind the texture that we are working with
+    glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE ); // set texture environment parameters
 
-    //Set texture parameters
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+    glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+    glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
 
-    //Unbind texture
-    glBindTexture( GL_TEXTURE_2D, NULL );
+    glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
+    glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
 
-    //Check for error
-    GLenum error = glGetError();
-    if( error != GL_NO_ERROR )
-    {
-        printf( "Error loading texture from %p pixels! %s\n", pixels, gluErrorString( error ) );
-        return false;
-    }
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
 
-    return true;
+    free( data ); //free the texture
+
+    return texture; //return the texture data
+
+}
+
+void square (void) {
+    glBindTexture( GL_TEXTURE_2D, texture ); //bind our texture to our shape
+    glRotatef( angle, 1.0f, 1.0f, 1.0f );
+    glBegin (GL_QUADS);
+    glTexCoord2d(0.0,0.0); glVertex2d(-1.0,-1.0); //with our vertices we have to assign a texcoord
+    glTexCoord2d(1.0,0.0); glVertex2d(+1.0,-1.0); //so that our texture has some points to draw to
+    glTexCoord2d(1.0,1.0); glVertex2d(+1.0,+1.0);
+    glTexCoord2d(0.0,1.0); glVertex2d(-1.0,+1.0);
+    glEnd();
 }
 
 
-// Realiza a criação de uma textura quadriculada no array realizado manualmente
-bool loadMedia()
-{
-    //Checkerboard pixels
-    const int CHECKERBOARD_WIDTH = 128;
-    const int CHECKERBOARD_HEIGHT = 128;
-    const int CHECKERBOARD_PIXEL_COUNT = CHECKERBOARD_WIDTH * CHECKERBOARD_HEIGHT;
-    GLuint checkerBoard[ CHECKERBOARD_PIXEL_COUNT ];
-
-    //Go through pixels
-    for( int i = 0; i < CHECKERBOARD_PIXEL_COUNT; ++i )
-    {
-        //Get the individual color components
-        GLubyte* colors = (GLubyte*)&checkerBoard[ i ];
-
-        //If the 5th bit of the x and y offsets of the pixel do not match
-        if( i / 128 & 16 ^ i % 128 & 16 )
-        {
-            //Set pixel to white
-            colors[ 0 ] = 0xFF;
-            colors[ 1 ] = 0xFF;
-            colors[ 2 ] = 0xFF;
-            colors[ 3 ] = 0xFF;
-        }
-        else
-        {
-            //Set pixel to red
-            colors[ 0 ] = 0xFF;
-            colors[ 1 ] = 0x00;
-            colors[ 2 ] = 0x00;
-            colors[ 3 ] = 0xFF;
-        }
-    }
-    //Load texture
-    if(! loadTextureFromPixels32( checkerBoard, CHECKERBOARD_WIDTH, CHECKERBOARD_HEIGHT ) )
-    {
-		printf( "Unable to load checkerboard texture!\n" );
-        return false;
-    }
-
-    return true;
-}
-
-
-void RenderizarTextura(GLfloat x, GLfloat y)
-{
-    // Checa se tem textura armazenada para começar a desenhar
-    if(mTextureID != 0){
-        // Limpando qualquer transformação
-        glLoadIdentity();
-
-        // Movimentando o ponto de renderizacao para o desejado
-        glTranslatef(x,y,0.0f);
-
-        // Vinculando novamente a textura aos objetos desejados
-        glBindTexture(GL_TEXTURE_2D, mTextureID);
-
-        // Desenhando um objeto texturizado
-        glBegin(GL_QUADS);
-        glTexCoord2f(0.0f,0.0f); glVertex2f(0.0f, 0.0f);
-        glTexCoord2f(1.0f,0.0f); glVertex2f(mTextureWidth, 0.0f);
-        glTexCoord2f(1.0f,1.0f); glVertex2f(mTextureWidth, mTextureHeight);
-        glTexCoord2f(0.0f,1.0f); glVertex2f(0.0f, mTextureHeight);
-        glEnd();
-    }
-
-}
 
 void face(){
                 float di = 1.0/20.0;
@@ -344,16 +265,14 @@ static void display(void)
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
 
-     glOrtho(-500.0, 500.0, -500.0, 500.0, -1000.0, 1000.0);
+     glOrtho(-4.0, 4.0, -4.0, 4.0, -1000.0, 1000.0);
 //     gluLookAt(1.0,0.0,0.7,0.0,0.0,0.5,0.0,0.0,1.0);
-
 
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
 
-    RenderizarTextura(0.0f, 3.0f);
     desenhaCubo();
 
 
@@ -361,6 +280,8 @@ static void display(void)
         glPushMatrix();
         BaseCirculo();
 
+    glEnable(GL_TEXTURE_2D);
+    square();
        // chao();
 
   //  eixos(10.0);
@@ -454,15 +375,7 @@ int main(int argc, char *argv[])
 
     glutCreateWindow("Jogo de Tiro");
 
-    glEnable(GL_TEXTURE_2D);
     glutReshapeFunc(resize);
-
-    //Load media
-    if( !loadMedia() )
-    {
-        printf( "Unable to load media!\n" );
-        return 2;
-    }
 
     glutDisplayFunc(display);
     glutKeyboardFunc(key);
@@ -490,11 +403,11 @@ int main(int argc, char *argv[])
     glMaterialfv(GL_FRONT, GL_SPECULAR,  mat_specular);
     glMaterialfv(GL_FRONT, GL_SHININESS, high_shininess);
 
-//    texture = LoadTexture("texture.raw",256,256);
+    texture = LoadTexture("texture.raw",256,256);
 
     glutMainLoop();
 
-//    FreeTexture( texture );
+    FreeTexture( texture );
 
     return EXIT_SUCCESS;
 }

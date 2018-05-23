@@ -1,11 +1,13 @@
 # depslib dependency file v1.0
-1526645347 source:c:\users\lcr07\google drive\maua\5ano\computação grafica\projetofinal_opengl\jogo_opengl\projeto_jogo_tiro_opengl\main.cpp
+1527089803 source:c:\users\lcr07\google drive\maua\5ano\computação grafica\projetofinal_opengl\jogo_opengl\projeto_jogo_tiro_opengl\main.cpp
+	<stdio.h>
+	<stdlib.h>
+	"readBMP.h"
 	<windows.h>
 	<gl/glu.h>
 	<math.h>
 	<GLUT/glut.h>
 	<GL/glut.h>
-	<stdlib.h>
 
 1301111162 c:\program files (x86)\codeblocks\mingw\include\windows.h
 	<winresrc.h>
@@ -217,7 +219,7 @@
 
 1301111164 c:\program files (x86)\codeblocks\mingw\include\gl\gl.h
 
-1526232605 c:\program files (x86)\codeblocks\mingw\include\gl\glut.h
+1526315263 c:\program files (x86)\codeblocks\mingw\include\gl\glut.h
 	<windows.h>
 	<GL/gl.h>
 	<GL/glu.h>
@@ -251,4 +253,6 @@
 	<stddef.h>
 
 1526840054 c:\users\lcr07\downloads\projetofinal_opengl\projetofinal_opengl\jogo_opengl\projeto_jogo_tiro_opengl\readbmp.h
+
+1526864530 c:\users\lcr07\google drive\maua\5ano\computação grafica\projetofinal_opengl\jogo_opengl\projeto_jogo_tiro_opengl\readbmp.h
 
