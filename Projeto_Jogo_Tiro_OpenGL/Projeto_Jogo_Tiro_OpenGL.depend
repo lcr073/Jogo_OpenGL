@@ -219,7 +219,7 @@
 
 1301111164 c:\program files (x86)\codeblocks\mingw\include\gl\gl.h
 
-1526315263 c:\program files (x86)\codeblocks\mingw\include\gl\glut.h
+1526232605 c:\program files (x86)\codeblocks\mingw\include\gl\glut.h
 	<windows.h>
 	<GL/gl.h>
 	<GL/glu.h>
@@ -227,7 +227,7 @@
 1341006774 c:\program files (x86)\codeblocks\mingw\include\math.h
 	<_mingw.h>
 
-1526844461 source:c:\users\lcr07\downloads\projetofinal_opengl\projetofinal_opengl\jogo_opengl\projeto_jogo_tiro_opengl\main.cpp
+1527781445 source:c:\users\lcr07\downloads\projetofinal_opengl\projetofinal_opengl\jogo_opengl\projeto_jogo_tiro_opengl\main.cpp
 	<stdio.h>
 	<stdlib.h>
 	"readBMP.h"

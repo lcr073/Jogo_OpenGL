@@ -12,6 +12,7 @@
  * using the + and - keys.
  */
 #include <stdio.h>
+#include <time.h>
 #include <stdlib.h>
 #include "readBMP.h" // para textura
 #include <windows.h>
@@ -294,6 +295,11 @@ float lx=0.0f,lz=-1.0f;
 // XZ position of the camera
 float x=0.0f,z=2.0f;
 bool atirou = false;
+// Variavel que controlara o delta de tempo entre frames
+clock_t tempo_clock;
+// Guarda o tempo gasto da ultima iteração de frame
+double tempo_gasto;
+
 
 // Ajusta velocidade da bala
 float velProj = 0.001;
@@ -600,7 +606,6 @@ void atira(float balaPosIniX, float balaPosIniY, float balaPoslxDisp, float bala
     glPopMatrix();
 }
 
-
 // Criando um objeto de particula
 struct Particula{
     float pos[3];
@@ -609,11 +614,22 @@ struct Particula{
     float tempoDeVida;
 };
 
-void instanciaParticula(Particula particula){
+void instanciaParticula(Particula *particula, float xSistPart,float ySistPart,float zSistPart){
     glPushMatrix();
 
+    // Define posição inicial particula
+    particula->pos[0] = xSistPart;
+    particula->pos[1] = ySistPart;
+    particula->pos[2] = zSistPart;
+
     // Definindo posição inicial da particula
-    glTranslatef(particula.pos[0],particula.pos[1],particula.pos[2]);
+    glTranslatef(particula->pos[0],particula->pos[1],particula->pos[2]);
+
+    // Acrescenta um tempo de vida para a particula
+    particula->tempoDeVida = 15.0;
+    particula->tempoVivido = 15.0;
+
+    printf("%f", particula->tempoVivido);
 
     // Desenha a particula em si
     desenhaCubo();
@@ -621,35 +637,52 @@ void instanciaParticula(Particula particula){
     glPopMatrix();
 }
 
+// Funcao de debug, utilizada para matar uma particula
+void mataParticula(Particula particula){
+    int i = 1;
+}
+
+// Funcao que ficara atualizando as caracteristcas de cada particula
+// Tempo de vida, trajetoria...
+void updateParticula(Particula particula){
+    // Decrementa o tempo de vida da particula pelo tempo do ultimo update de frame
+    particula.tempoVivido = particula.tempoVivido - tempo_gasto;
+
+    // Calcula movimento
+}
 
 // Definicao do sistema de particulas, onde ponto ondele ficara emitindo
 void SistemaDeParticulas(float xSistPart, float ySistPart, float zSistPart){
 
     // Definindo uma cte de numero de particulas
-    int nParticulas = 2;
+    int nParticulas = 1;
 
     // Criando uma lista com as particulas existentes
     Particula particula[nParticulas];
 
-    // Varre todas as particulas criadas para instancia-las
+
+    // Varre todas as particulas para aplicar as funcoes necessarias
     for (int i = 0; i <= nParticulas; i ++){
+        // Verifica se a particula ja morreu para recriar-la
+        // Particula morreu
+        if(particula[i].tempoVivido <= 0){
+            instanciaParticula(&particula[i],xSistPart,ySistPart,zSistPart);
+        }
+        // Particula ainda nao morreu mas precisa se mover
+        else{
 
+
+        }
+
+            //printf("%f", particula[i].tempoVivido);
         // Ponto de nascimento das particulas sao todos na mesma fonte
-        particula[i].pos[0] = xSistPart + (rand() % 4);
-        particula[i].pos[1] = ySistPart;
-        particula[i].pos[2] = zSistPart;
-
-        // Define tempo de vida das particulas em 3 segundos
-      //  particula[i].tempoDeVida = 3.0f;
+     //   particula[i].pos[0] = xSistPart + (rand() % 4);
 
 
-        instanciaParticula(particula[i]);
+
     }
 
     // Sistema de atualizacao para posicao das particulas
-
-
-
 }
 
 
@@ -711,6 +744,9 @@ static void resize(int width, int height)
 
 static void display(void)
 {
+    // Obtem o inicio da contagem
+    tempo_clock = clock();
+
     glClearColor(1,1,1,1);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
@@ -752,6 +788,14 @@ static void display(void)
     //termina de rodar o mundo
     glPopMatrix();
     glutSwapBuffers();
+
+    tempo_clock = clock() - tempo_clock;
+
+    // Calculando o tempo da operacao
+    tempo_gasto = ((double) tempo_clock) / CLOCKS_PER_SEC;
+    // Retorna o tempo gasto nesse loop de execucao
+ //   printf ("%f", (double) tempo_gasto);
+
 }
 
 
