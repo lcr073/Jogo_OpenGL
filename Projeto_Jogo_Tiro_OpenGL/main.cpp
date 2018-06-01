@@ -287,6 +287,15 @@ float img[]= {
 };
 
 
+// Criando um objeto de particula
+struct Particula{
+    float pos[3];
+    float velocidade[3];
+    float tempoVivido;
+    float tempoDeVida;
+    // angulo de movimentacao
+    float angulo_sentido;
+};
 
 // Angulo
 float angle=0.0;
@@ -300,7 +309,6 @@ clock_t tempo_clock;
 // Guarda o tempo gasto da ultima iteração de frame
 double tempo_gasto;
 
-
 // Ajusta velocidade da bala
 float velProj = 0.001;
 
@@ -310,9 +318,14 @@ float balaPosIniY = 0;
 float balaPoslxDisp = 0;
 float balaPoslyDisp = 0;
 
+// Variavel que indica se a pessoa ainda tem tiros restantes
+int qtdTirosRestantes = 5;
 
-// Variavel que indica se tem balas ainda não eliminadas
-int qtdTiros = 5;
+// Variavel que indica qtd total de balas que a pessoa pode ter
+const int qtdTiros = 5;
+
+// Vetor que guardará todos os projeteis atirados
+Particula projetil[qtdTiros];
 
 GLuint texture;
 
@@ -599,22 +612,59 @@ void desenhaCubo(){
             glPopMatrix();
 }
 
-void atira(float balaPosIniX, float balaPosIniY, float balaPoslxDisp, float balaPoslyDisp){
+void atira(struct Particula *projetil, float balaPosIniX, float balaPosIniY, float balaPoslxDisp, float balaPoslyDisp){
+    // Nao tem mais balas entao nao atira
+    if(qtdTirosRestantes <= 0){
+
+    }
+    // A pessoa ainda tem tiros disponiveis
+    else{
+        // Armazena as informações sobre o projetil no projetil
+        // Armazena posicao inicial
+        // posicao x
+        projetil->pos[0] = balaPosIniX;
+        // posicao y
+        projetil->pos[1] = balaPosIniY;
+
+        // Armazena trajetoria
+        projetil->angulo_sentido = angle;
+
+        // Instancia o projetil
+        glPushMatrix();
+        glTranslatef(projetil->pos[0],projetil->pos[1],0.0);
+        desenhaCubo();
+        glPopMatrix();
+        atirou = false;
+    }
+}
+
+// Realiza as atualizações da posiçao do projetil
+void updateProjetil(struct Particula *projetil){
+    // Manda o projetil para frente de acordo com sua posicao atual e angulo
+    // obtem o sentido atraves do angulo
+    float lx2 = sin(projetil->angulo_sentido);
+    float lz2 = -cos(projetil->angulo_sentido);
+
+    // vai atualizando a posicao pela posicao de deslocamento necessaria
+    projetil->pos[0] = projetil->pos[0] + lx2;
+    projetil->pos[1] = projetil->pos[1] + lz2;
+
+    // Instancia o projetil
     glPushMatrix();
-    glTranslatef(balaPosIniX,balaPosIniY,0.0);
+    glTranslatef(projetil->pos[0],projetil->pos[1],0.0);
     desenhaCubo();
     glPopMatrix();
 }
 
-// Criando um objeto de particula
-struct Particula{
-    float pos[3];
-    float velocidade[3];
-    float tempoVivido;
-    float tempoDeVida;
-};
 
-void instanciaParticula(Particula *particula, float xSistPart,float ySistPart,float zSistPart){
+// DEFINICOES PARTICULAS
+// Definindo uma cte de numero de particulas
+const int nParticulas = 1;
+
+// Criando uma lista com as particulas existentes
+Particula particula[nParticulas];
+
+void instanciaParticula(struct Particula *particula, float xSistPart,float ySistPart,float zSistPart){
     glPushMatrix();
 
     // Define posição inicial particula
@@ -625,11 +675,12 @@ void instanciaParticula(Particula *particula, float xSistPart,float ySistPart,fl
     // Definindo posição inicial da particula
     glTranslatef(particula->pos[0],particula->pos[1],particula->pos[2]);
 
-    // Acrescenta um tempo de vida para a particula
-    particula->tempoDeVida = 15.0;
-    particula->tempoVivido = 15.0;
+    // Definindo o sentido de movimentacao da particula pelo seu angulo
+    particula->angulo_sentido = 30.0f;
 
-    printf("%f", particula->tempoVivido);
+    // Acrescenta um tempo de vida para a particula
+    particula->tempoDeVida = 2.0;
+    particula->tempoVivido = 2.0;
 
     // Desenha a particula em si
     desenhaCubo();
@@ -644,37 +695,44 @@ void mataParticula(Particula particula){
 
 // Funcao que ficara atualizando as caracteristcas de cada particula
 // Tempo de vida, trajetoria...
-void updateParticula(Particula particula){
+void updateParticula(struct Particula *particula){
     // Decrementa o tempo de vida da particula pelo tempo do ultimo update de frame
-    particula.tempoVivido = particula.tempoVivido - tempo_gasto;
+    particula->tempoVivido = particula->tempoVivido - tempo_gasto;
 
     // Calcula movimento
+    glPushMatrix();
+
+ //   particula->pos[2] = ((particula->pos[2] - cos(particula->angulo_sentido)) + (rand() % 40)) * tempo_gasto ;
+ //   particula->pos[1] = (particula->pos[1] + sin(particula->angulo_sentido)) * tempo_gasto;
+
+    particula->pos[0] = particula->pos[0] + 0.05f;
+    particula->pos[1] = particula->pos[1] + 0.05f;
+
+    // Definindo posição da particula
+    glTranslatef(particula->pos[0],particula->pos[1],particula->pos[2]);
+
+    // Desenha a particula em si
+    desenhaCubo();
+
+    glPopMatrix();
 }
 
 // Definicao do sistema de particulas, onde ponto ondele ficara emitindo
 void SistemaDeParticulas(float xSistPart, float ySistPart, float zSistPart){
 
-    // Definindo uma cte de numero de particulas
-    int nParticulas = 1;
-
-    // Criando uma lista com as particulas existentes
-    Particula particula[nParticulas];
-
-
     // Varre todas as particulas para aplicar as funcoes necessarias
-    for (int i = 0; i <= nParticulas; i ++){
+    for (int i = 0; i < nParticulas; i ++){
         // Verifica se a particula ja morreu para recriar-la
         // Particula morreu
-        if(particula[i].tempoVivido <= 0){
+        if(particula[i].tempoVivido <= 0.0){
             instanciaParticula(&particula[i],xSistPart,ySistPart,zSistPart);
         }
         // Particula ainda nao morreu mas precisa se mover
         else{
-
-
+            updateParticula(&particula[i]);
         }
 
-            //printf("%f", particula[i].tempoVivido);
+            printf("%f ", particula[i].tempoVivido);
         // Ponto de nascimento das particulas sao todos na mesma fonte
      //   particula[i].pos[0] = xSistPart + (rand() % 4);
 
@@ -777,8 +835,10 @@ static void display(void)
         SistemaDeParticulas(3.0,0.0,0.0);
 
     if(atirou == true){
-        atira(balaPosIniX,balaPosIniY,balaPoslxDisp, balaPoslyDisp);
+        atira(&projetil[1],balaPosIniX,balaPosIniY,balaPoslxDisp, balaPoslyDisp);
     }
+
+    updateProjetil(&projetil[1]);
 
 
   //  eixos(10.0);
@@ -815,6 +875,7 @@ static void key(unsigned char key, int xx, int yy)
                     balaPoslyDisp = lz;
 
                     atirou = true;
+                    qtdTirosRestantes = qtdTirosRestantes - 1;
               //      qtdTiros = qtdTiros - 1;
 //                }
 
