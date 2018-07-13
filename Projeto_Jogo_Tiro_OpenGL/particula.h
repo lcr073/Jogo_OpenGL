@@ -1,0 +1,6 @@
+#ifndef PARTICULA_H_INCLUDED
+#define PARTICULA_H_INCLUDED
+
+int teste();
+
+#endif // PARTICULA_H_INCLUDED
