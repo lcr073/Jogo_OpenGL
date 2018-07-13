@@ -711,6 +711,50 @@ void desenhaParticula(struct Particula *particula){
             glPopMatrix();
 }
 
+void eixos(float T)
+{
+    glBegin(GL_LINES);
+
+    glColor3f(1,0,0);
+
+    glVertex3f(0,0,0);
+    glVertex3f(T,0,0);
+
+    glColor3f(0,1,0);
+
+    glVertex3f(0,0,0);
+    glVertex3f(0,T,0);
+
+    glColor3f(0,0,1);
+
+    glVertex3f(0,0,0);
+    glVertex3f(0,0,T);
+
+    glEnd();
+};
+
+void BaseCirculo(){
+    float umin = 0;
+    float umax = 360;
+    float du = (umax-umin)/32;
+      // float du = 4 * M_PI / 180;
+    float i;
+    i = umin;
+
+    // Definindo as dimensos do cubo
+    //glScaled(1.0,2.0,4.0);
+
+    while(i <= umax){
+            glPushMatrix();
+                glRotated(i,0,0,1);
+                glTranslated(16,0,2.0);
+            glScalef(1,1,4);
+
+                desenhaCubo();
+            glPopMatrix();
+        i = i + du;
+    }
+}
 // ### Fim modelagem dos objetos ###
 
 void atira(struct Particula *projetil, float balaPosIniX, float balaPosIniY, float balaPoslxDisp, float balaPoslyDisp){
@@ -758,17 +802,27 @@ void updateProjetil(struct Particula *projetil){
 }
 
 
-// DEFINICOES PARTICULAS
+// ### INICIO DEFINICOES PARTICULAS ###
 // Definindo a quantidade de sistemas de particulas em paralelo possiveis
 const int nSistemaParticulas = 10;
 
-// Debug de um unico sistema
+// Instanciando as fontes de particulas disponiveis na memoria
 SistemaParticula sistema[nSistemaParticulas];
 
 // Criando uma lista com as particulas existentes
 Particula particula[nParticulas];
 
 void instanciaParticula(struct Particula *particula, float xSistPart,float ySistPart,float zSistPart){
+    /*
+    A funcao instanciaParticula e responsavel pela criacao de uma nova particula.
+    A funcao cria uma nova particula e define as caracteristicas basicas desta, como
+    a cor da particula, o tempo de vida maximo que ela pode ter e um diametro de uma
+    esfera de movimentacao, ao executar a funcao determina para a particula sua posicao
+    inicial, seguindo o padrao da fonte, mas define o tempo vivido e sua velocidade seguindo
+    uma relacao randomica, para dar a cada particula um movimento independente e diferente
+    das outras.
+    */
+
     glPushMatrix();
 
     // Raio da geracao da esfera randomica
@@ -822,14 +876,17 @@ void instanciaParticula(struct Particula *particula, float xSistPart,float ySist
     glPopMatrix();
 }
 
-// Funcao de debug, utilizada para matar uma particula
-void mataParticula(Particula particula){
-    int i = 1;
-}
-
 // Funcao que ficara atualizando as caracteristcas de cada particula
 // Tempo de vida, trajetoria...
 void updateParticula(struct Particula *particula){
+    /*
+    A funcao updateParticula e responsavel por atualizar toda condicao de uma particula
+    que esta viva, assim ela decrementa o tempo de vida da mesma analisando o tempo de
+    processamento da aplicacao, alem de alterar seu posicionamento atraves da velocidade
+    analisando a consistencia da nova posicao para nao atravesar o plano de "chao",
+    alem da alteracao da cor dela, respeitando o decaimento pela distancia.
+    */
+
     // Decrementa o tempo de vida da particula pelo tempo do ultimo update de frame
     particula->tempoVivido = particula->tempoVivido - tempo_gasto;
 
@@ -873,6 +930,11 @@ void updateParticula(struct Particula *particula){
 
 // Definicao do sistema de particulas, onde ponto ondele ficara emitindo
 void SistemaDeParticulas(struct SistemaParticula *sistema){
+    /*
+    A funcao SistemaDeParticula e responsavel por atraves de uma referencia a uma fonte de particulas
+    analisar todas as particulas desse sistema e ficar analisando seu tempo de vida para se for necessario
+    instanciar uma nova caso a particula ja esteja morta ou atualizar seu posicionamento
+    */
 
     // Varre todas as particulas para aplicar as funcoes necessarias
     for (int i = 0; i < nParticulas; i ++){
@@ -890,6 +952,15 @@ void SistemaDeParticulas(struct SistemaParticula *sistema){
 
 // Definicao e gerenciamento do sistema de fonte de particulas
 void CriacaoFonteDeParticulas(struct SistemaParticula *sistema, float xSistPart, float ySistPart, float zSistpart,float tempoDeVidaSist){
+    /*
+        CriacaoFonteDeParticulas e uma funcao que tem por objetivo
+        receber uma referencia para uma posiçao de um sistema de particulas
+        e colocar as definicoes necessarias nela e chamar a funcao para realmente instanciar
+        as particulas nessa fonte
+
+        Recebe como parametros: * A referencia de um sistema, a localizacao em que ela sera posicionada (x,y,z)
+        e seu tempo de vida (Obs, tempo de vida do sistema e nao da particula)
+    */
     // Definicao da fonte de emissao das particulas
     sistema->pos[0] = xSistPart;
     sistema->pos[1] = ySistPart;
@@ -902,50 +973,11 @@ void CriacaoFonteDeParticulas(struct SistemaParticula *sistema, float xSistPart,
     SistemaDeParticulas(sistema);
 }
 
-void eixos(float T)
-{
-    glBegin(GL_LINES);
+void GerenciamentoFonteDeParticulas(){
 
-    glColor3f(1,0,0);
 
-    glVertex3f(0,0,0);
-    glVertex3f(T,0,0);
-
-    glColor3f(0,1,0);
-
-    glVertex3f(0,0,0);
-    glVertex3f(0,T,0);
-
-    glColor3f(0,0,1);
-
-    glVertex3f(0,0,0);
-    glVertex3f(0,0,T);
-
-    glEnd();
-};
-
-void BaseCirculo(){
-    float umin = 0;
-    float umax = 360;
-    float du = (umax-umin)/32;
-      // float du = 4 * M_PI / 180;
-    float i;
-    i = umin;
-
-    // Definindo as dimensos do cubo
-    //glScaled(1.0,2.0,4.0);
-
-    while(i <= umax){
-            glPushMatrix();
-                glRotated(i,0,0,1);
-                glTranslated(16,0,2.0);
-            glScalef(1,1,4);
-
-                desenhaCubo();
-            glPopMatrix();
-        i = i + du;
-    }
 }
+// ### FIM DEFINICOES PARTICULAS ###
 
 /* GLUT callback Handlers */
 
