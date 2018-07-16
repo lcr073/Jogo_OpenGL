@@ -1023,11 +1023,25 @@ int GerenciamentoDeInstanciamentoFonteDeParticulas(float xSistPart, float ySistP
 }
 
 void UpdateFonteDeParticula(){
+    /*
+        UpdateFonteDeParticula e uma funcao que tem por objetivo
+        varrer todo o vetor de sistemas disponiveis, caso tenha
+        sistemas ativos, reduz seu respectivo tempo de vida e desenha
+        naquele frame e caso esteja morto, para de desenhar e arredonda
+        seu valor para 0.0
+    */
     // Varre todo o vetor de sistema de particulas
-
     for(int i = 0; i < nSistemaParticulas; i++){
         if(sistema[i].tempoDeVidaSistema > 0.0f){
-              CriacaoFonteDeParticulas(&sistema[i],sistema[i].pos[0],sistema[i].pos[1],sistema[i].pos[2],sistema[i].tempoDeVidaSistema);
+
+            // Decrementa o tempo de vida do sistema de emissao de particula pelo tempo do ultimo update de frame
+            sistema[i].tempoDeVidaSistema = sistema[i].tempoDeVidaSistema - tempo_gasto;
+
+            // Desenha a fonte para aquele frame
+            CriacaoFonteDeParticulas(&sistema[i],sistema[i].pos[0],sistema[i].pos[1],sistema[i].pos[2],sistema[i].tempoDeVidaSistema);
+        }
+        else{
+            sistema[i].tempoDeVidaSistema = 0.0f;
         }
     }
 }
@@ -1079,22 +1093,17 @@ static void display(void)
         BaseCirculo();
         chao();
 
-        //SistemaDeParticulas(3.0,0.0,0.0);
-
-        //CriacaoFonteDeParticulas(&sistema[1],7.0f,6.0f,0.0f,100.0f);
-        //CriacaoFonteDeParticulas(&sistema[2],0.0f,6.0f,0.0f,100.0f);
-        //CriacaoFonteDeParticulas(&sistema[3],7.0f,0.0f,0.0f,100.0f);
 
 UpdateFonteDeParticula();
 
         if(bau == 1){
-GerenciamentoDeInstanciamentoFonteDeParticulas(0.0f,6.0f,0.0f,100.0f);
-GerenciamentoDeInstanciamentoFonteDeParticulas(-3.0f,0.0f,0.0f,100.0f);
-GerenciamentoDeInstanciamentoFonteDeParticulas(-6.0f,16.0f,0.0f,100.0f);
-GerenciamentoDeInstanciamentoFonteDeParticulas(-9.0f,6.0f,0.0f,100.0f);
-GerenciamentoDeInstanciamentoFonteDeParticulas(3.0f,0.0f,0.0f,100.0f);
-GerenciamentoDeInstanciamentoFonteDeParticulas(6.0f,16.0f,0.0f,100.0f);
-GerenciamentoDeInstanciamentoFonteDeParticulas(9.0f,6.0f,0.0f,100.0f);
+GerenciamentoDeInstanciamentoFonteDeParticulas(0.0f,6.0f,0.0f,10.0f);
+GerenciamentoDeInstanciamentoFonteDeParticulas(-3.0f,0.0f,0.0f,10.0f);
+GerenciamentoDeInstanciamentoFonteDeParticulas(-6.0f,16.0f,0.0f,10.0f);
+GerenciamentoDeInstanciamentoFonteDeParticulas(-9.0f,6.0f,0.0f,10.0f);
+GerenciamentoDeInstanciamentoFonteDeParticulas(3.0f,0.0f,0.0f,10.0f);
+GerenciamentoDeInstanciamentoFonteDeParticulas(6.0f,16.0f,0.0f,10.0f);
+GerenciamentoDeInstanciamentoFonteDeParticulas(9.0f,6.0f,0.0f,10.0f);
 
             bau = 2;
         }
