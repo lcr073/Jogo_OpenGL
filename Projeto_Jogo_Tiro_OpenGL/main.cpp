@@ -1217,7 +1217,10 @@ static void key(unsigned char key, int xx, int yy)
                     balaPoslyDisp = lz;
 
                     atirou = true;
-                    qtdTirosRestantes = qtdTirosRestantes - 1;
+                    if(qtdTirosRestantes > 0){
+                        qtdTirosRestantes = qtdTirosRestantes - 1;
+                    }
+
               //      qtdTiros = qtdTiros - 1;
 //                }
 
