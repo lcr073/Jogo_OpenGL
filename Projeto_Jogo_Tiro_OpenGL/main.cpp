@@ -938,6 +938,7 @@ void CriacaoFonteDeParticulas(struct SistemaParticula *sistema, float xSistPart,
     SistemaDeParticulas(sistema);
 }
 
+
 int GerenciamentoDeInstanciamentoFonteDeParticulas(float xSistPart, float ySistPart, float zSistpart,float tempoDeVidaSist){
     /*
     A funcao GerenciamentoDeInstanciamentoFonteDeParticulas permite
@@ -965,6 +966,11 @@ int GerenciamentoDeInstanciamentoFonteDeParticulas(float xSistPart, float ySistP
             sistema[i].pos[1] = ySistPart;
             sistema[i].pos[2] = zSistpart;
             sistema[i].tempoDeVidaSistema = tempoDeVidaSist;
+            // "Mata todas as particulas existentes daquele sistema
+            for(int j = 0; j < nParticulas; j++){
+                sistema[i].particula[j].tempoDeVida = 0.0f;
+                sistema[i].particula[j].tempoVivido = 0.0f;
+            }
             return 0;
         }
         // Sistema ainda esta vivo
@@ -982,6 +988,12 @@ int GerenciamentoDeInstanciamentoFonteDeParticulas(float xSistPart, float ySistP
             sistema[indexSistemaParticulas].pos[1] = ySistPart;
             sistema[indexSistemaParticulas].pos[2] = zSistpart;
             sistema[indexSistemaParticulas].tempoDeVidaSistema = tempoDeVidaSist;
+
+            // "Mata todas as particulas existentes daquele sistema
+            for(int j = 0; j < nParticulas; j++){
+                sistema[indexSistemaParticulas].particula[j].tempoDeVida = 0.0f;
+                sistema[indexSistemaParticulas].particula[j].tempoVivido = 0.0f;
+            }
         return 1;
 }
 
@@ -1240,7 +1252,7 @@ static void key(unsigned char key, int xx, int yy)
 			x += lx ;
 			z += lz ;
 
-			if(objetoColidiu(&colisoesMapa[1], x, z)){
+			if(objetoColidiu(&colisoesMapa[2], x, z)){
                 x -= lx ;
                 z -= lz ;
 			}
