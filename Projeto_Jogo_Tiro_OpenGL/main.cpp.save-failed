@@ -11,6 +11,8 @@
  * number of geometry stacks and slices can be adjusted
  * using the + and - keys.
  */
+
+
 #include <stdio.h>
 #include <time.h>
 #include <stdlib.h>
@@ -18,11 +20,18 @@
 #include <windows.h>
 #include <gl/glu.h>
 #include <math.h>
+#include "particula.h"
 #ifdef __APPLE__
 #include <GLUT/glut.h>
 #else
 #include <GL/glut.h>
 #endif
+
+int bau = 1;
+
+// Obtem a largura e altura da janela
+int ScreenWidth;
+int screenHeight;
 
 float textGrama[] = {
 0xb0,0xb0,0x80,0xac,0xac,0x7c,0xb0,0xb4,0x80,0xb4,0xb8,0x84,0xb0,0xb4,0x80,0xb0,0xb4,0x80,0xb0,0xb8,0x84,0xa8,0xb0,0x7c,0x9c,0xa4,0x70,0xb0,0xbc,0x84,0xb4,0xc0,0x88,0xa0,0xb0,0x78,0x98,0xa8,0x70,0xa4,0xb4,0x7c,0xa4,0xb4,0x7c,0x98,0xa8,0x70,0xac,0xb8,0x7c,0xa4,0xb0,0x74,0x90,0x9c,0x60,0x8c,0x94,0x58,0x90,0x9c,0x60,0x8c,0x98,0x5c,0x88,0x90,0x54,0x8c,0x94,0x58,0x98,0xa4,0x68,0x90,0x9c,0x60,0xa4,0xac,0x70,0xa0,0xac,0x70,0xa0,0xac,0x70,0xac,0xb4,0x78,0xa0,0xac,0x70,0xa8,0xb0,0x74,0xa4,0xa8,0x70,0xa8,0xac,0x74,0xa8,0xb0,0x74,0xb8,0xbc,0x80,0xb0,0xb8,0x7c,0xac,0xb0,0x74,0xb4,0xb8,0x7c,0xa4,0xac,0x70,0xb4,0xbc,0x7c,0xa0,0xa4,0x68,0x9c,0xa0,0x64,0xb0,0xb8,0x78,0xbc,0xc0,0x84,0xb4,0xb8,0x7c,0xb0,0xb8,0x78,0xc0,0xc4,0x84,0xc4,0xc8,0x8c,0xc0,0xbc,0x84,0xb0,0xb0,0x78,0xa8,0xa8,0x70,0xa4,0xa8,0x70,0xac,0xb4,0x78,0xb0,0xb4,0x78,0xa0,0xa8,0x6c,0xa4,0xb0,0x74,0xa8,0xb4,0x78,0x94,0xa4,0x64,0x98,0xa8,0x6c,0xa0,0xb4,0x74,0x94,0xa4,0x64,0x98,0xac,0x6c,0xa4,0xb8,0x78,0xac,0xbc,0x7c,0xa4,0xb4,0x74,0x9c,0xa8,0x6c,0x9c,0xa8,0x6c,0x9c,0xac,0x6c,0x98,0xa8,0x68,0x98,0xa4,0x68,0x94,0xa0,0x64,0x90,0xa0,0x64,0xa8,0xb4,0x78,0xa4,0xb4,0x78,0x94,0xa0,0x64,0x94,0xa0,0x64,0xb0,0xbc,0x80,0xb0,0xc0,0x84,0x84,0x90,0x54,0x9c,0xa0,0x70,0xb8,0xb8,0x8c,0xc8,0xcc,0xa0,0xcc,0xd0,0xa4,0xb0,0xb0,0x84,0x90,0x94,0x68,0xa4,0xa8,0x78,0xc0,0xc0,0x94,0x9c,0xa0,0x70,0xb4,0xb8,0x8c,0xbc,0xc0,0x90,0xa0,0xa4,0x78,0x98,0x98,0x6c,0xac,0xb0,0x80,0xb8,0xbc,0x90,0xac,0xb0,0x80,0xa8,0xac,0x7c,0xa0,0xa4,0x6c,0x90,0x94,0x60,0xa0,0xa4,0x74,0xa4,0xa8,0x74,0x94,0x98,0x64,0xa4,0xa8,0x74,0xac,0xb0,0x7c,0xb8,0xbc,0x8c,0xa8,0xac,0x7c,0xb8,0xbc,0x8c,0xb0,0xb4,0x84,0xbc,0xbc,0x90,0xc8,0xcc,0xa0,0xb4,0xb4,0x88,0xb8,0xbc,0x8c,0xc0,0xc4,0x98,0xc4,0xc4,0x9c,0xbc,0xc0,0x94,0xc0,0xc0,0x98,0xb8,0xbc,0x90,0xb0,0xb4,0x88,0xb8,0xbc,0x90,0xb8,0xbc,0x90,0xb0,0xb0,0x88,0xc0,0xc0,0x98,0xc8,0xcc,0xa0,0xc4,0xc8,0x9c,0xc0,0xc0,0x98,0xbc,0xbc,0x94,0xb4,0xb8,0x8c,0xac,0xb0,0x84
@@ -286,16 +295,33 @@ float img[]= {
 ,0xfc,0xfc,0xfc,0xfc,0xfc,0xfc,0x3c,0x3c,0x3c,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x04,0x04,0x04,0x1c,0x14,0x18,0x14,0x08,0x10,0x18,0x0c,0x14,0x20,0x10,0x1c,0x28,0x18,0x24,0x1c,0x14,0x1c,0x34,0x34,0x34,0x04,0x0c,0x08,0x00,0x04,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x0c,0x00,0x00,0x24,0x04,0x0c,0x40,0x14,0x20,0x40,0x14,0x1c,0x38,0x18,0x1c,0x38,0x28,0x28,0x24,0x18,0x1c,0x28,0x1c,0x24,0x3c,0x2c,0x38,0x38,0x28,0x38,0x78,0x60,0x74,0x74,0x5c,0x74,0x5c,0x40,0x58,0x58,0x40,0x54,0x38,0x2c,0x38,0x08,0x00,0x08,0x40,0x3c,0x40,0x90,0x90,0x90,0x28,0x28,0x28,0x14,0x14,0x14,0x08,0x08,0x08,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x14,0x14,0x14,0x1c,0x1c,0x1c,0x08,0x08,0x08,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x08,0x08,0x08
 };
 
+// ### Inicio definicoes de estruturas ###
 
-// Criando um objeto de particula
+// Criando um (estrutura) objeto de particula
 struct Particula{
     float pos[3];
     float velocidade[3];
     float tempoVivido;
     float tempoDeVida;
+
+    // Cor da particula para ativar efeito de transparencia
+    float cor[4];
+
     // angulo de movimentacao
     float angulo_sentido;
 };
+
+// Criando uma estrutura para a fonte de particulas
+
+// Definindo uma cte de numero de particulas
+const int nParticulas = 60;
+
+struct SistemaParticula{
+    float pos[3];
+    float tempoDeVidaSistema;
+    Particula particula[nParticulas];
+};
+// ### Fim definicoes de estruturas ###
 
 // Angulo
 float angle=0.0;
@@ -303,6 +329,7 @@ float angle=0.0;
 float lx=0.0f,lz=-1.0f;
 // XZ position of the camera
 float x=0.0f,z=2.0f;
+
 
 // ####### Definições de variavel de tempo #######
 // Variavel que controlara o delta de tempo entre frames
@@ -327,25 +354,85 @@ float balaPoslxDisp = 0;
 float balaPoslyDisp = 0;
 
 // ######## Definições de colisão ######
+// estrutura para colisao por coordenada
 struct posColisaoMapa{
     int xCol;
     int yCol;
 };
 
-posColisaoMapa colisoesMapa[3];
+posColisaoMapa colisoesMapa[10];
 
+// Criando uma estrutura para colisoes de caixa (bounded box)
+struct caixaColisao{
+    // A posicao sera considerada como um quadrado de colisao
+    float pos[2];
+    float largura,altura;
+};
+
+// Vetor de colisoes possiveis no mapa
+caixaColisao colisaoMapa[35];
+
+bool checaColisaoBox(struct caixaColisao colBox1, struct caixaColisao colBox2){
+    /*
+        A funcao checaColisaoBox verifica se houve uma intersecção entre 2 caixas,
+        ou seja, dois objetos colidiram
+    */
+    // Se houve colisao
+    if((colBox1.pos[0] < colBox2.pos[0] + colBox2.largura) && (colBox1.pos[0] +  colBox1.largura > colBox2.pos[0]) &&
+       (colBox1.pos[1] < colBox2.pos[1] + colBox2.altura) && (colBox1.pos[1] + colBox1.altura > colBox2.pos[1])){
+       return true;
+    }
+    // Se nao houve colisao
+    else{
+        return false;
+    }
+}
+
+void adicionaColisaoMapa(struct caixaColisao *caixa, float x, float y){
+/*
+    A funcao adicionaColisaoMapa e utilizada para adicionar caixas
+    de colisao dentro do mapa
+    struct caixaColisao, float x, float y
+*/
+
+    caixa->altura = 1.0f;
+    caixa->largura = 1.0f;
+    caixa->pos[0] = x;
+    caixa->pos[1] = y;
+}
 // ########## Fim definicoes de colisao ####
 
 // Variavel que indica se a pessoa ainda tem tiros restantes
-int qtdTirosRestantes = 5;
+int qtdTirosRestantes = 50;
 
 // Variavel que indica qtd total de balas que a pessoa pode ter
-const int qtdTiros = 5;
+const int qtdTiros = 50;
 
 // Vetor que guardará todos os projeteis atirados
 Particula projetil[qtdTiros];
-// ######## Fim definições tiro ###########
 
+void colisoesDoMapa(){
+    // Definindo colisoes do mapa
+    adicionaColisaoMapa(&colisaoMapa[0], 0.0f, 16.0f);
+    adicionaColisaoMapa(&colisaoMapa[1], -3.0f, 16.0f);
+    adicionaColisaoMapa(&colisaoMapa[2], -6.0f, 14.0f);
+    adicionaColisaoMapa(&colisaoMapa[3], -9.0f, 13.0f);
+
+
+    adicionaColisaoMapa(&colisaoMapa[4], -11.0f, 11.0f);
+    adicionaColisaoMapa(&colisaoMapa[5], -13.0f, 9.0f);
+    adicionaColisaoMapa(&colisaoMapa[6], -15.0f, 6.0f);
+    adicionaColisaoMapa(&colisaoMapa[7], -16.0f, 3.0f);
+    adicionaColisaoMapa(&colisaoMapa[8], -16.0f, 0.0f);
+    adicionaColisaoMapa(&colisaoMapa[9], -16.0f, -3.0f);
+    adicionaColisaoMapa(&colisaoMapa[10], -15.0f, -6.0f);
+
+    adicionaColisaoMapa(&colisaoMapa[11], -14.0f, -9.0f);
+    adicionaColisaoMapa(&colisaoMapa[12], -12.0f, -12.0f);
+    adicionaColisaoMapa(&colisaoMapa[13], -9.0f, -14.0f);
+    adicionaColisaoMapa(&colisaoMapa[14], -6.0f, -14.0f);
+}
+// ######## Fim definições tiro ###########
 
 
 bool objetoColidiu(struct posColisaoMapa *colisoesMapa, float xObj, float yObj){
@@ -364,6 +451,7 @@ bool objetoColidiu(struct posColisaoMapa *colisoesMapa, float xObj, float yObj){
 }
 
 
+// ### Inicio definicoes de textura ###
 GLuint texture;
 
 //Checkerboard texture
@@ -524,6 +612,9 @@ void RenderizarTextura(GLfloat x, GLfloat y)
 
 }
 
+// ### Fim definicoes de textura ###
+
+// ### Inicio modelagem dos objetos ###
 void face(){
                 float di = 1.0/20.0;
 
@@ -613,6 +704,10 @@ void chao(){
                 glPopMatrix();
 }
 
+void desenhaPlanoIntro(){
+                glRotated(-90,0,1,0);
+                face();
+}
 
 void desenhaCubo(){
             glColor3d(1,0,1);
@@ -649,145 +744,42 @@ void desenhaCubo(){
             glPopMatrix();
 }
 
-void atira(struct Particula *projetil, float balaPosIniX, float balaPosIniY, float balaPoslxDisp, float balaPoslyDisp){
-    // Nao tem mais balas entao nao atira
-    if(qtdTirosRestantes <= 0){
+void desenhaParticula(struct Particula *particula){
 
-    }
-    // A pessoa ainda tem tiros disponiveis
-    else{
-        // Armazena as informações sobre o projetil no projetil
-        // Armazena posicao inicial
-        // posicao x
-        projetil->pos[0] = balaPosIniX;
-        // posicao y
-        projetil->pos[1] = balaPosIniY;
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+            glColor4f(particula->cor[0],particula->cor[1],particula->cor[2],particula->cor[3]);
+                face();
 
-        // Armazena trajetoria
-        projetil->angulo_sentido = angle;
+            glPushMatrix();
+             //   glColor3d(1,0,0);
+                glRotated(90.0,0,0,1);
+                face();
+            glPopMatrix();
 
-        // Instancia o projetil
-        glPushMatrix();
-        glTranslatef(projetil->pos[0],projetil->pos[1],0.0);
-        desenhaCubo();
-        glPopMatrix();
-        atirou = false;
-    }
+            glPushMatrix();
+              //  glColor3d(0,1,0);
+                glRotated(180.0,0,0,1);
+                face();
+            glPopMatrix();
+
+            glPushMatrix();
+               // glColor3d(1,1,0);
+                glRotated(270.0,0,0,1);
+                face();
+            glPopMatrix();
+
+            glPushMatrix();
+              //  glColor3d(0,1,0);
+                glRotated(90,0,1,0);
+                face();
+            glPopMatrix();
+
+            glPushMatrix();
+              //  glColor3d(0,1,1);
+                glRotated(-90,0,1,0);
+                face();
+            glPopMatrix();
 }
-
-// Realiza as atualizações da posiçao do projetil
-void updateProjetil(struct Particula *projetil){
-    // Manda o projetil para frente de acordo com sua posicao atual e angulo
-    // obtem o sentido atraves do angulo
-    float lx2 = sin(projetil->angulo_sentido);
-    float lz2 = -cos(projetil->angulo_sentido);
-
-    // vai atualizando a posicao pela posicao de deslocamento necessaria
-    projetil->pos[0] = projetil->pos[0] + lx2;
-    projetil->pos[1] = projetil->pos[1] + lz2;
-
-    // Instancia o projetil
-    glPushMatrix();
-    glTranslatef(projetil->pos[0],projetil->pos[1],0.0);
-    desenhaCubo();
-    glPopMatrix();
-}
-
-
-// DEFINICOES PARTICULAS
-// Definindo uma cte de numero de particulas
-const int nParticulas = 1;
-
-// Criando uma lista com as particulas existentes
-Particula particula[nParticulas];
-
-void instanciaParticula(struct Particula *particula, float xSistPart,float ySistPart,float zSistPart){
-    glPushMatrix();
-
-    // Define posição inicial particula
-    particula->pos[0] = xSistPart;
-    particula->pos[1] = ySistPart;
-    particula->pos[2] = zSistPart;
-
-    // Definição da velocidade randomica da particula (Randomico em x,y)
-    particula->velocidade[0] = (rand() % 4);
-    particula->velocidade[1] = (rand() % 4);
-    particula->velocidade[2] = 0.0f;
-
-    // Definindo posição inicial da particula
-    glTranslatef(particula->pos[0],particula->pos[1],particula->pos[2]);
-
-    // Definindo o sentido de movimentacao da particula pelo seu angulo
-    particula->angulo_sentido = 30.0f;
-
-    // Acrescenta um tempo de vida para a particula
-    particula->tempoDeVida = 2.0;
-    particula->tempoVivido = 2.0;
-
-    // Desenha a particula em si
-    desenhaCubo();
-
-    glPopMatrix();
-}
-
-// Funcao de debug, utilizada para matar uma particula
-void mataParticula(Particula particula){
-    int i = 1;
-}
-
-// Funcao que ficara atualizando as caracteristcas de cada particula
-// Tempo de vida, trajetoria...
-void updateParticula(struct Particula *particula){
-    // Decrementa o tempo de vida da particula pelo tempo do ultimo update de frame
-    particula->tempoVivido = particula->tempoVivido - tempo_gasto;
-
-    // Calcula movimento
-    glPushMatrix();
-
- //   particula->pos[2] = ((particula->pos[2] - cos(particula->angulo_sentido)) + (rand() % 40)) * tempo_gasto ;
- //   particula->pos[1] = (particula->pos[1] + sin(particula->angulo_sentido)) * tempo_gasto;
-
-    // Definindo movimentacao em x y mas cte
-    //particula->pos[0] = particula->pos[0] + 0.05f;
-    //particula->pos[1] = particula->pos[1] + 0.05f;
-
-    // Definindo movimentacao em um x, y random
-    particula->pos[0] = particula->pos[0] + particula->velocidade[0];
-    particula->pos[1] = particula->pos[1] + particula->velocidade[1];
-    particula->pos[2] = particula->pos[2] + particula->velocidade[2];
-
-    // Definindo posição da particula
-    glTranslatef(particula->pos[0],particula->pos[1],particula->pos[2]);
-
-    // Desenha a particula em si
-    desenhaCubo();
-
-    glPopMatrix();
-}
-
-// Definicao do sistema de particulas, onde ponto ondele ficara emitindo
-void SistemaDeParticulas(float xSistPart, float ySistPart, float zSistPart){
-
-    // Varre todas as particulas para aplicar as funcoes necessarias
-    for (int i = 0; i < nParticulas; i ++){
-        // Verifica se a particula ja morreu para recriar-la
-        // Particula morreu
-        if(particula[i].tempoVivido <= 0.0){
-            instanciaParticula(&particula[i],xSistPart,ySistPart,zSistPart);
-        }
-        // Particula ainda nao morreu mas precisa se mover
-        else{
-            updateParticula(&particula[i]);
-        }
-
-            printf("%f ", particula[i].tempoVivido);
-        // Ponto de nascimento das particulas sao todos na mesma fonte
-     //   particula[i].pos[0] = xSistPart + (rand() % 4);
-    }
-
-    // Sistema de atualizacao para posicao das particulas
-}
-
 
 void eixos(float T)
 {
@@ -833,6 +825,368 @@ void BaseCirculo(){
         i = i + du;
     }
 }
+// ### Fim modelagem dos objetos ###
+
+// ### Inicio das definicoes do personagem ###
+    // Caixa de colisao do personagem
+    caixaColisao personagem;
+
+void criaPersonagem(){
+    // Caixa de colisao do personagem
+    personagem.altura = 1.0f;
+    personagem.largura = 1.0f;
+    personagem.pos[0] = x;
+    personagem.pos[1] = z;
+
+    // Desenha cubo de personagem
+    desenhaCubo();
+}
+
+// ### Fim das definicoes do personagem ###
+
+
+// ### INICIO DEFINICOES PARTICULAS ###
+// Definindo a quantidade de sistemas de particulas em paralelo possiveis
+const int nSistemaParticulas = 10;
+
+// Instanciando as fontes de particulas disponiveis na memoria
+SistemaParticula sistema[nSistemaParticulas];
+
+// Criando uma lista com as particulas existentes
+Particula particula[nParticulas];
+
+void instanciaParticula(struct Particula *particula, float xSistPart,float ySistPart,float zSistPart){
+    /*
+    A funcao instanciaParticula e responsavel pela criacao de uma nova particula.
+    A funcao cria uma nova particula e define as caracteristicas basicas desta, como
+    a cor da particula, o tempo de vida maximo que ela pode ter e um diametro de uma
+    esfera de movimentacao, ao executar a funcao determina para a particula sua posicao
+    inicial, seguindo o padrao da fonte, mas define o tempo vivido e sua velocidade seguindo
+    uma relacao randomica, para dar a cada particula um movimento independente e diferente
+    das outras e define o tamanho da particula.
+    */
+
+    glPushMatrix();
+
+    // Raio da geracao da esfera randomica
+    int diamRandEsf = 3;
+
+    // Tempo de vida maximo para uma particula
+    int tempoVividoMax = 2;
+
+    // Define a cor da particula
+    particula->cor[0] = 1.0f; // R
+    particula->cor[1] = 0.0f; // G
+    particula->cor[2] = 0.0f; // B
+    particula->cor[3] = 1.0f; // Alfa
+
+    // Define posição inicial particula
+    particula->pos[0] = xSistPart;
+    particula->pos[1] = ySistPart;
+    particula->pos[2] = zSistPart;
+
+    // Definição da velocidade randomica da particula (Randomico em x,y e z)
+
+    // Rand retorna valores inteiros, entao o mesmo e normalizado e deixado tambem sua parte negativa
+    particula->velocidade[0] = ((rand() % diamRandEsf) / (diamRandEsf * 1.0f)) - (1/ 2.0f);
+    particula->velocidade[1] = ((rand() % diamRandEsf) / (diamRandEsf * 1.0f)) - (1 / 2.0f);
+    particula->velocidade[2] = (((rand() % diamRandEsf) / (diamRandEsf * 1.0f)) - (1/ 2.0f)) + 0.5f;
+
+    // Definindo posição inicial da particula
+    glTranslatef(particula->pos[0],particula->pos[1],particula->pos[2]);
+
+    // Definindo o sentido de movimentacao da particula pelo seu angulo
+    particula->angulo_sentido = 30.0f;
+
+    // Acrescenta um tempo de vida para a particula
+    //particula->tempoDeVida = 0.5f;
+    //particula->tempoVivido = 0.5f;
+
+    // Faz o tempo de vida randomico para cada particula para dar um efeito independente
+    particula->tempoVivido = ((rand() % tempoVividoMax)) / (tempoVividoMax * 1.0f) ;
+    // Tempo de vida e o total sem o decaimento do tempo ja vivivdo
+    particula->tempoDeVida = particula->tempoVivido;
+
+    // Reduzindo o tamanho da particula
+    glScalef(0.2f,0.2f,0.2f);
+
+    // Definindo a cor da particula
+    glColor4f(particula->cor[0],particula->cor[1],particula->cor[2],particula->cor[3]);
+
+    // Desenha a particula em si
+    desenhaParticula(particula);
+
+    glPopMatrix();
+}
+
+// Funcao que ficara atualizando as caracteristcas de cada particula
+// Tempo de vida, trajetoria...
+void updateParticula(struct Particula *particula){
+    /*
+    A funcao updateParticula e responsavel por atualizar toda condicao de uma particula
+    que esta viva, assim ela decrementa o tempo de vida da mesma analisando o tempo de
+    processamento da aplicacao, alem de alterar seu posicionamento atraves da velocidade
+    analisando a consistencia da nova posicao para nao atravesar o plano de "chao",
+    alem da alteracao da cor dela, respeitando o decaimento pela distancia, alem de
+    definir o tamanho final da particula.
+    */
+
+    // Decrementa o tempo de vida da particula pelo tempo do ultimo update de frame
+    particula->tempoVivido = particula->tempoVivido - tempo_gasto;
+
+    // Calcula movimento
+    glPushMatrix();
+
+ //   particula->pos[2] = ((particula->pos[2] - cos(particula->angulo_sentido)) + (rand() % 40)) * tempo_gasto ;
+ //   particula->pos[1] = (particula->pos[1] + sin(particula->angulo_sentido)) * tempo_gasto;
+
+    // Definindo movimentacao em x y mas cte
+    //particula->pos[0] = particula->pos[0] + 0.05f;
+    //particula->pos[1] = particula->pos[1] + 0.05f;
+
+    // Definindo movimentacao em um x, y random
+    particula->pos[0] = particula->pos[0] + particula->velocidade[0];
+    particula->pos[1] = particula->pos[1] + particula->velocidade[1];
+
+    // Verificacao para nao deixar a particula passar abaixo do solo
+    if((particula->pos[2] + particula->velocidade[2]) < 0.0f){
+        particula->pos[2] = 0.0f;
+    }
+    else{
+        particula->pos[2] = particula->pos[2] + particula->velocidade[2];
+    }
+
+
+    // Definindo posição da particula
+    glTranslatef(particula->pos[0],particula->pos[1],particula->pos[2]);
+
+    // Altera dimensao da particula
+    glScalef(0.2f,0.2f,0.2f);
+
+    // Decaimento da opacidade da particula com o tempo
+    particula->cor[3] = (particula->tempoVivido) / (particula->tempoDeVida); // Alfa
+
+    // Desenha a particula em si
+    desenhaParticula(particula);
+
+    glPopMatrix();
+}
+
+// Definicao do sistema de particulas, onde ponto ondele ficara emitindo
+void SistemaDeParticulas(struct SistemaParticula *sistema){
+    /*
+    A funcao SistemaDeParticula e responsavel por atraves de uma referencia a uma fonte de particulas
+    analisar todas as particulas desse sistema e ficar analisando seu tempo de vida para se for necessario
+    instanciar uma nova caso a particula ja esteja morta ou atualizar seu posicionamento
+    */
+
+    // Varre todas as particulas para aplicar as funcoes necessarias
+    for (int i = 0; i < nParticulas; i ++){
+        // Verifica se a particula ja morreu para recriar-la
+        // Particula morreu
+        if(sistema->particula[i].tempoVivido <= 0.0){
+            instanciaParticula(&sistema->particula[i],sistema->pos[0],sistema->pos[1],sistema->pos[2]);
+        }
+        // Particula ainda nao morreu mas precisa se mover
+        else{
+            updateParticula(&sistema->particula[i]);
+        }
+    }
+}
+
+// Definicao e gerenciamento do sistema de fonte de particulas
+void CriacaoFonteDeParticulas(struct SistemaParticula *sistema, float xSistPart, float ySistPart, float zSistpart,float tempoDeVidaSist){
+    /*
+        CriacaoFonteDeParticulas e uma funcao que tem por objetivo
+        receber uma referencia para uma posiçao de um sistema de particulas
+        e colocar as definicoes necessarias nela e chamar a funcao para realmente instanciar
+        as particulas nessa fonte
+
+        Recebe como parametros: * A referencia de um sistema, a localizacao em que ela sera posicionada (x,y,z)
+        e seu tempo de vida (Obs, tempo de vida do sistema e nao da particula)
+    */
+    // Definicao da fonte de emissao das particulas
+    sistema->pos[0] = xSistPart;
+    sistema->pos[1] = ySistPart;
+    sistema->pos[2] = zSistpart;
+
+    // Definicao do tempo de vida de geracao de novas particulas daquele sistema
+    sistema->tempoDeVidaSistema = tempoDeVidaSist;
+
+    // Criacao de todas as particulas desse sistema
+    SistemaDeParticulas(sistema);
+}
+
+
+int GerenciamentoDeInstanciamentoFonteDeParticulas(float xSistPart, float ySistPart, float zSistpart,float tempoDeVidaSist){
+    /*
+    A funcao GerenciamentoDeInstanciamentoFonteDeParticulas permite
+    atualiza a struct de particulas existentes
+     atraves da definicao da posicao do sistema e do tempo de vida,
+    alocando no vetor de sistema ja existente na melhor posicao, ou substituindo caso
+    ja tenha ultrapassado seu limite.
+
+    Retornos: 0 -> Tinha espaco no sistema
+              1 -> Sistema lotado e algum sistema substituido
+    */
+
+    // Guarda o indice do sistema
+    int indexSistemaParticulas = 0;
+    float tempoVidaSistemaParticula = 100.0f;
+
+    // Varre todo o vetor de sistema de particulas
+    for(int i = 0; i < nSistemaParticulas; i++){
+
+        // Analisa se o sistema de particula para aquela posicao esta "morto"
+        // Sistema esta morto
+        if((sistema[i].tempoDeVidaSistema) == 0.0f){
+            // Cria um sistema nesse indice
+            sistema[i].pos[0] = xSistPart;
+            sistema[i].pos[1] = ySistPart;
+            sistema[i].pos[2] = zSistpart;
+            sistema[i].tempoDeVidaSistema = tempoDeVidaSist;
+            // "Mata todas as particulas existentes daquele sistema
+            for(int j = 0; j < nParticulas; j++){
+                sistema[i].particula[j].tempoDeVida = 0.0f;
+                sistema[i].particula[j].tempoVivido = 0.0f;
+            }
+            return 0;
+        }
+        // Sistema ainda esta vivo
+        else{
+            if(tempoVidaSistemaParticula > sistema[i].tempoDeVidaSistema){
+                // Guarda o indice desse sistema e seu tempo de vida para ver se sera substituido
+                indexSistemaParticulas = i;
+                tempoVidaSistemaParticula = sistema[i].tempoDeVidaSistema;
+            }
+        }
+    }
+    // O vetor de sistema de particula esta lotado se saiu do for
+    // Cria o sistema de particula no indice de sistema q tem o menor tempo de vida
+            sistema[indexSistemaParticulas].pos[0] = xSistPart;
+            sistema[indexSistemaParticulas].pos[1] = ySistPart;
+            sistema[indexSistemaParticulas].pos[2] = zSistpart;
+            sistema[indexSistemaParticulas].tempoDeVidaSistema = tempoDeVidaSist;
+
+            // "Mata todas as particulas existentes daquele sistema
+            for(int j = 0; j < nParticulas; j++){
+                sistema[indexSistemaParticulas].particula[j].tempoDeVida = 0.0f;
+                sistema[indexSistemaParticulas].particula[j].tempoVivido = 0.0f;
+            }
+        return 1;
+}
+
+void UpdateFonteDeParticula(){
+    /*
+        UpdateFonteDeParticula e uma funcao que tem por objetivo
+        varrer todo o vetor de sistemas disponiveis, caso tenha
+        sistemas ativos, reduz seu respectivo tempo de vida e desenha
+        naquele frame e caso esteja morto, para de desenhar e arredonda
+        seu valor para 0.0
+    */
+    // Varre todo o vetor de sistema de particulas
+    for(int i = 0; i < nSistemaParticulas; i++){
+        if(sistema[i].tempoDeVidaSistema > 0.0f){
+
+            // Decrementa o tempo de vida do sistema de emissao de particula pelo tempo do ultimo update de frame
+            sistema[i].tempoDeVidaSistema = sistema[i].tempoDeVidaSistema - tempo_gasto;
+
+            // Desenha a fonte para aquele frame
+            CriacaoFonteDeParticulas(&sistema[i],sistema[i].pos[0],sistema[i].pos[1],sistema[i].pos[2],sistema[i].tempoDeVidaSistema);
+        }
+        else{
+            sistema[i].tempoDeVidaSistema = 0.0f;
+        }
+    }
+}
+
+// ### FIM DEFINICOES PARTICULAS ###
+
+// ### Inicio de definicoes de tela de introducao do jogo ###
+float tempoInstrucoes = 5.0f;
+
+// Funcao para escrever texto na tela
+void PrintTxtTela( int x, int y, char *st)
+/*
+    A funcao PrintTxtTela recebe uma string e exibe
+    na tela em alguma posicao especifica
+*/
+{
+int l,i;
+glPushMatrix();
+glColor3f(1.0f,1.0f,1.0f);
+glTranslatef(0.0f,7.0f,25.0f);
+l=strlen( st ); // see how many characters are in text string.
+glRasterPos2i( x, y); // location to start printing text
+    for( i=0; i < l; i++) // loop until i is greater then l
+    {
+    glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, st[i]); // Print a character on the screen
+    }
+glPopMatrix();
+}
+
+void apresentaInstrucoes(){
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glColor4f(0.0f,0.0f,0.0f,1-tempoInstrucoes);
+        glPushMatrix();
+        glScalef(20.0f,20.0f,50.0f);
+        desenhaPlanoIntro();
+        glPopMatrix();
+        tempoInstrucoes = tempoInstrucoes - tempo_gasto;
+        printf("%f", tempoInstrucoes);
+
+
+}
+
+// ### Fim de definicoes de tela de introducao do jogo ###
+
+
+void atira(struct Particula *projetil, float balaPosIniX, float balaPosIniY, float balaPoslxDisp, float balaPoslyDisp){
+    // Nao tem mais balas entao nao atira
+    if(qtdTirosRestantes <= 0){
+
+    }
+    // A pessoa ainda tem tiros disponiveis
+    else{
+        // Armazena as informações sobre o projetil no projetil
+        // Armazena posicao inicial
+        // posicao x
+        projetil->pos[0] = balaPosIniX;
+        // posicao y
+        projetil->pos[1] = balaPosIniY;
+
+        // Instancia particulas na posicao do disparo
+        GerenciamentoDeInstanciamentoFonteDeParticulas(balaPosIniX,balaPosIniY,0.0f,0.3f);
+
+        // Armazena trajetoria
+        projetil->angulo_sentido = angle;
+
+        // Instancia o projetil
+        glPushMatrix();
+        glTranslatef(projetil->pos[0],projetil->pos[1],0.0);
+        desenhaCubo();
+        glPopMatrix();
+        atirou = false;
+    }
+}
+
+// Realiza as atualizações da posiçao do projetil
+void updateProjetil(struct Particula *projetil){
+    // Manda o projetil para frente de acordo com sua posicao atual e angulo
+    // obtem o sentido atraves do angulo
+    float lx2 = sin(projetil->angulo_sentido);
+    float lz2 = -cos(projetil->angulo_sentido);
+
+    // vai atualizando a posicao pela posicao de deslocamento necessaria
+    projetil->pos[0] = projetil->pos[0] + lx2;
+    projetil->pos[1] = projetil->pos[1] + lz2;
+
+    // Instancia o projetil
+    glPushMatrix();
+    glTranslatef(projetil->pos[0],projetil->pos[1],0.0);
+    desenhaCubo();
+    glPopMatrix();
+}
 
 /* GLUT callback Handlers */
 
@@ -841,7 +1195,9 @@ static void resize(int width, int height)
     const float ar = (float) width / (float) height;
 
     glViewport(0, 0, width, height);
-
+    ScreenWidth = width;
+    screenHeight = height;
+    printf("%d \n",ScreenWidth);
   //  glFrustum(-ar, ar, -1.0, 1.0, 2.0, 100.0);
 }
 
@@ -854,21 +1210,57 @@ static void display(void)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
 
+    glEnable(GL_BLEND);
+
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
 
      glOrtho(-10.0, 10.0, -10.0, 10.0, -1000.0, 1000.0);
 //     gluLookAt(1.0,0.0,0.7,0.0,0.0,0.5,0.0,0.0,1.0);
 
-
-
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
 
-        desenhaCubo();
+    // Exibe instrucoes so por um determinado tempo
+    if(tempoInstrucoes > 0.0){
+        // Exibe as instrucoes de entrada
+        PrintTxtTela((20*(0.5*ScreenWidth)/ScreenWidth)-13,-5,"Instrucoes basicas:");
+        PrintTxtTela((20*(0.5*ScreenWidth)/ScreenWidth)-18,-7,"Para se movimentar use as teclas (W,A,S,D)");
+        PrintTxtTela((20*(0.5*ScreenWidth)/ScreenWidth)-18,-8,"Para atirar utilize a tecla (K)");
+        PrintTxtTela((20*(0.5*ScreenWidth)/ScreenWidth)-12,-10,"Aguarde...");
+
+        // Carrega um fundo preto
+        apresentaInstrucoes();
+    }
+
+    // Desenha elementos do HUD
+    char strBuf[15];
+    // Concatena o inteiro de qtd de tiros na string
+    sprintf(strBuf,"Qtd tiros: %d",qtdTirosRestantes);
+    // Exibe no canto da tela o valor
+    PrintTxtTela((20*(0.5*ScreenWidth)/ScreenWidth)-20,-9,strBuf);
+
+    // Adicionando as caixas de colisoes do mapa
+    colisoesDoMapa();
+
+    // Cria personagem e sua caixa de colisao
+    criaPersonagem();
+
+        // Teste de bondbox de colisao
+    caixaColisao teste1;
+    teste1.altura = 1.0f;
+    teste1.largura = 1.0f;
+    teste1.pos[0] = 0.0f;
+    teste1.pos[1] = 16.0f;
 
 
+    if(checaColisaoBox(personagem,teste1)){
+        printf("Colidiu");
+    }
+    else{
+        printf("Nao Colidiu");
+    }
 
 	gluLookAt(	x, z, 0.4f,x+lx, z+lz,0.0f,0.0f, 0.0f,1.0f);
         glPushMatrix();
@@ -877,7 +1269,8 @@ static void display(void)
         BaseCirculo();
         chao();
 
-        SistemaDeParticulas(3.0,0.0,0.0);
+    // Ativa sistema que fica desenhando as particulas
+    UpdateFonteDeParticula();
 
     if(atirou == true){
         atira(&projetil[1],balaPosIniX,balaPosIniY,balaPoslxDisp, balaPoslyDisp);
@@ -920,7 +1313,10 @@ static void key(unsigned char key, int xx, int yy)
                     balaPoslyDisp = lz;
 
                     atirou = true;
-                    qtdTirosRestantes = qtdTirosRestantes - 1;
+                    if(qtdTirosRestantes > 0){
+                        qtdTirosRestantes = qtdTirosRestantes - 1;
+                    }
+
               //      qtdTiros = qtdTiros - 1;
 //                }
 
@@ -940,7 +1336,7 @@ static void key(unsigned char key, int xx, int yy)
 			x += lx ;
 			z += lz ;
 
-			if(objetoColidiu(&colisoesMapa[1], x, z)){
+			if(objetoColidiu(&colisoesMapa[2], x, z)){
                 x -= lx ;
                 z -= lz ;
 			}
@@ -996,9 +1392,7 @@ int main(int argc, char *argv[])
         textGrama[i] /= 255.0f;
     }
 
-    // Definindo colisoes de teste
-    colisoesMapa[1].xCol = 0;
-    colisoesMapa[1].yCol = 16;
+
 
     glutInit(&argc, argv);
     glutInitWindowSize(640,480);

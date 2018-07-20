@@ -29,6 +29,7 @@
 
 int bau = 1;
 
+// Obtem a largura e altura da janela
 int ScreenWidth;
 int screenHeight;
 
@@ -295,6 +296,7 @@ float img[]= {
 };
 
 // ### Inicio definicoes de estruturas ###
+
 // Criando um (estrutura) objeto de particula
 struct Particula{
     float pos[3];
@@ -352,6 +354,7 @@ float balaPoslxDisp = 0;
 float balaPoslyDisp = 0;
 
 // ######## Definições de colisão ######
+// estrutura para colisao por coordenada
 struct posColisaoMapa{
     int xCol;
     int yCol;
@@ -359,6 +362,45 @@ struct posColisaoMapa{
 
 posColisaoMapa colisoesMapa[10];
 
+// Criando uma estrutura para colisoes de caixa (bounded box)
+struct caixaColisao{
+    // A posicao sera considerada como um quadrado de colisao
+    float pos[2];
+    float largura,altura;
+};
+
+const int nCaixasColisoes = 35;
+// Vetor de colisoes possiveis no mapa
+caixaColisao colisaoMapa[nCaixasColisoes];
+
+bool checaColisaoBox(struct caixaColisao colBox1, struct caixaColisao colBox2){
+    /*
+        A funcao checaColisaoBox verifica se houve uma intersecção entre 2 caixas,
+        ou seja, dois objetos colidiram
+    */
+    // Se houve colisao
+    if((colBox1.pos[0] < colBox2.pos[0] + colBox2.largura) && (colBox1.pos[0] +  colBox1.largura > colBox2.pos[0]) &&
+       (colBox1.pos[1] < colBox2.pos[1] + colBox2.altura) && (colBox1.pos[1] + colBox1.altura > colBox2.pos[1])){
+       return true;
+    }
+    // Se nao houve colisao
+    else{
+        return false;
+    }
+}
+
+void adicionaColisaoMapa(struct caixaColisao *caixa, float x, float y){
+/*
+    A funcao adicionaColisaoMapa e utilizada para adicionar caixas
+    de colisao dentro do mapa
+    struct caixaColisao, float x, float y
+*/
+
+    caixa->altura = 1.0f;
+    caixa->largura = 1.0f;
+    caixa->pos[0] = x;
+    caixa->pos[1] = y;
+}
 // ########## Fim definicoes de colisao ####
 
 // Variavel que indica se a pessoa ainda tem tiros restantes
@@ -369,9 +411,53 @@ const int qtdTiros = 50;
 
 // Vetor que guardará todos os projeteis atirados
 Particula projetil[qtdTiros];
+
+void colisoesDoMapa(){
+    // Definindo colisoes do mapa
+    adicionaColisaoMapa(&colisaoMapa[0], 0.0f, 16.0f);
+    adicionaColisaoMapa(&colisaoMapa[1], -3.0f, 16.0f);
+    adicionaColisaoMapa(&colisaoMapa[2], -6.0f, 14.0f);
+    adicionaColisaoMapa(&colisaoMapa[3], -9.0f, 13.0f);
+
+
+    adicionaColisaoMapa(&colisaoMapa[4], -11.0f, 11.0f);
+    adicionaColisaoMapa(&colisaoMapa[5], -13.0f, 9.0f);
+    adicionaColisaoMapa(&colisaoMapa[6], -15.0f, 6.0f);
+    adicionaColisaoMapa(&colisaoMapa[7], -16.0f, 3.0f);
+    adicionaColisaoMapa(&colisaoMapa[8], -16.0f, 0.0f);
+    adicionaColisaoMapa(&colisaoMapa[9], -16.0f, -3.0f);
+    adicionaColisaoMapa(&colisaoMapa[10], -15.0f, -6.0f);
+
+    adicionaColisaoMapa(&colisaoMapa[11], -14.0f, -9.0f);
+    adicionaColisaoMapa(&colisaoMapa[12], -12.0f, -12.0f);
+    adicionaColisaoMapa(&colisaoMapa[13], -9.0f, -14.0f);
+    adicionaColisaoMapa(&colisaoMapa[14], -6.0f, -14.0f);
+
+    adicionaColisaoMapa(&colisaoMapa[15], -3.0f, -15.0f);
+    adicionaColisaoMapa(&colisaoMapa[16], 0.0f, -16.0f);
+    adicionaColisaoMapa(&colisaoMapa[17], 3.0f, -15.0f);
+    adicionaColisaoMapa(&colisaoMapa[18], 6.0f, -15.0f);
+    adicionaColisaoMapa(&colisaoMapa[19], 9.0f, -14.0f);
+
+    adicionaColisaoMapa(&colisaoMapa[20], 12.0f, -12.0f);
+    adicionaColisaoMapa(&colisaoMapa[21], 14.0f, -9.0f);
+    adicionaColisaoMapa(&colisaoMapa[22], 16.0f, -6.0f);
+    adicionaColisaoMapa(&colisaoMapa[23], 16.0f, -3.0f);
+    adicionaColisaoMapa(&colisaoMapa[24], 17.0f, 0.0f);
+
+    adicionaColisaoMapa(&colisaoMapa[25], 16.0f, 3.0f);
+    adicionaColisaoMapa(&colisaoMapa[26], 15.0f, 7.0f);
+    adicionaColisaoMapa(&colisaoMapa[27], 13.0f, 9.0f);
+    adicionaColisaoMapa(&colisaoMapa[28], 12.0f, 11.0f);
+    adicionaColisaoMapa(&colisaoMapa[29], 9.0f, 14.0f);
+    adicionaColisaoMapa(&colisaoMapa[30], 6.0f, 15.0f);
+    adicionaColisaoMapa(&colisaoMapa[31], 3.0f, 16.0f);
+
+
+}
 // ######## Fim definições tiro ###########
 
-
+// Comparacao de colisao de objeto baseado em cordenada
 bool objetoColidiu(struct posColisaoMapa *colisoesMapa, float xObj, float yObj){
     int xObjInt = floor(xObj);
     int yObjInt = floor(yObj);
@@ -387,6 +473,22 @@ bool objetoColidiu(struct posColisaoMapa *colisoesMapa, float xObj, float yObj){
     return false;
 }
 
+// Comparacao de colisao de objeto baseada em caixa AABB
+bool comparaTodasColisoes(struct caixaColisao comparaCaixa){
+    /*
+        A funcao comparaTodasColisoes verifica comparando todas as caixas
+        de colisao do mapa com a caixa passada como referencia, para ver
+        se houve colisao entre qualquer uma delas, retornando true
+        se ocorreu ou false se caso contrario
+    */
+    for(int i=0; i<nCaixasColisoes;i++){
+        // Caso ocorreu alguma colisao
+        if(checaColisaoBox(comparaCaixa,colisaoMapa[i])){
+            return true;
+       }
+    }
+    return false;
+}
 
 // ### Inicio definicoes de textura ###
 GLuint texture;
@@ -764,6 +866,22 @@ void BaseCirculo(){
 }
 // ### Fim modelagem dos objetos ###
 
+// ### Inicio das definicoes do personagem ###
+    // Caixa de colisao do personagem
+    caixaColisao personagem;
+
+void criaPersonagem(){
+    // Caixa de colisao do personagem
+    personagem.altura = 1.0f;
+    personagem.largura = 1.0f;
+    personagem.pos[0] = x;
+    personagem.pos[1] = z;
+
+    // Desenha cubo de personagem
+    desenhaCubo();
+}
+
+// ### Fim das definicoes do personagem ###
 
 
 // ### INICIO DEFINICOES PARTICULAS ###
@@ -1024,7 +1142,7 @@ void UpdateFonteDeParticula(){
 // ### FIM DEFINICOES PARTICULAS ###
 
 // ### Inicio de definicoes de tela de introducao do jogo ###
-float tempoInstrucoes = 10.0f;
+float tempoInstrucoes = 5.0f;
 
 // Funcao para escrever texto na tela
 void PrintTxtTela( int x, int y, char *st)
@@ -1162,8 +1280,27 @@ static void display(void)
     // Exibe no canto da tela o valor
     PrintTxtTela((20*(0.5*ScreenWidth)/ScreenWidth)-20,-9,strBuf);
 
-    // Desenha cubo de personagem
-    desenhaCubo();
+    // Adicionando as caixas de colisoes do mapa
+    colisoesDoMapa();
+
+    // Cria personagem e sua caixa de colisao
+    criaPersonagem();
+
+        // Teste de bondbox de colisao
+    caixaColisao teste1;
+    teste1.altura = 1.0f;
+    teste1.largura = 1.0f;
+    teste1.pos[0] = 0.0f;
+    teste1.pos[1] = 16.0f;
+
+
+    //if(checaColisaoBox(personagem,teste1)){
+    if(comparaTodasColisoes(personagem)){
+        printf("Colidiu");
+    }
+    else{
+        printf("Nao Colidiu");
+    }
 
 	gluLookAt(	x, z, 0.4f,x+lx, z+lz,0.0f,0.0f, 0.0f,1.0f);
         glPushMatrix();
@@ -1174,20 +1311,7 @@ static void display(void)
 
     // Ativa sistema que fica desenhando as particulas
     UpdateFonteDeParticula();
- /*       if(bau == 1){
 
-GerenciamentoDeInstanciamentoFonteDeParticulas(0.0f,6.0f,0.0f,10.0f);
-GerenciamentoDeInstanciamentoFonteDeParticulas(-3.0f,0.0f,0.0f,10.0f);
-GerenciamentoDeInstanciamentoFonteDeParticulas(-6.0f,16.0f,0.0f,10.0f);
-GerenciamentoDeInstanciamentoFonteDeParticulas(-9.0f,6.0f,0.0f,10.0f);
-GerenciamentoDeInstanciamentoFonteDeParticulas(3.0f,0.0f,0.0f,10.0f);
-GerenciamentoDeInstanciamentoFonteDeParticulas(6.0f,16.0f,0.0f,10.0f);
-GerenciamentoDeInstanciamentoFonteDeParticulas(9.0f,6.0f,0.0f,10.0f);
-
-            bau = 2;
-        }
-
-*/
     if(atirou == true){
         atira(&projetil[1],balaPosIniX,balaPosIniY,balaPoslxDisp, balaPoslyDisp);
     }
@@ -1252,7 +1376,8 @@ static void key(unsigned char key, int xx, int yy)
 			x += lx ;
 			z += lz ;
 
-			if(objetoColidiu(&colisoesMapa[2], x, z)){
+			//if(objetoColidiu(&colisoesMapa[2], x, z)){
+			if(comparaTodasColisoes(personagem)){
                 x -= lx ;
                 z -= lz ;
 			}
@@ -1261,6 +1386,11 @@ static void key(unsigned char key, int xx, int yy)
 		case 's' :
 			x -= lx;
 			z -= lz;
+
+      //      if(comparaTodasColisoes(personagem)){
+      //          x += lx;
+      //          z += lz;
+       //     }
 			break;
 
         case 'p':
@@ -1307,37 +1437,6 @@ int main(int argc, char *argv[])
         img[i] /= 255.0f;
         textGrama[i] /= 255.0f;
     }
-
-    // Definindo colisoes de teste
-    colisoesMapa[1].xCol = 0;
-    colisoesMapa[1].yCol = 16;
-
-    colisoesMapa[2].xCol = -3;
-    colisoesMapa[2].yCol = 16;
-
-    colisoesMapa[3].xCol = -9;
-    colisoesMapa[3].yCol = 14;
-
-    colisoesMapa[4].xCol = -11;
-    colisoesMapa[4].yCol = 11;
-
-    colisoesMapa[5].xCol = -13;
-    colisoesMapa[5].yCol = 9;
-
-    colisoesMapa[6].xCol = -15;
-    colisoesMapa[6].yCol = 6;
-
-    colisoesMapa[7].xCol = -16;
-    colisoesMapa[7].yCol = 3;
-
-    colisoesMapa[8].xCol = -16;
-    colisoesMapa[8].yCol = 0;
-
-    colisoesMapa[9].xCol = -16;
-    colisoesMapa[9].yCol = -3;
-
-    colisoesMapa[10].xCol = -15;
-    colisoesMapa[10].yCol = -6;
 
 
 
