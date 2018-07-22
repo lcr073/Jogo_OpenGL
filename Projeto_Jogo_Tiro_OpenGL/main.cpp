@@ -1142,7 +1142,7 @@ void UpdateFonteDeParticula(){
 // ### FIM DEFINICOES PARTICULAS ###
 
 // ### Inicio de definicoes de tela de introducao do jogo ###
-float tempoInstrucoes = 5.0f;
+float tempoInstrucoes = 23.0f;
 
 // Funcao para escrever texto na tela
 void PrintTxtTela( int x, int y, char *st)
@@ -1220,6 +1220,8 @@ void updateProjetil(struct Particula *projetil){
     projetil->pos[0] = projetil->pos[0] + lx2;
     projetil->pos[1] = projetil->pos[1] + lz2;
 
+    // Verifica se colidiu antes de desenhar a proxima
+
     // Instancia o projetil
     glPushMatrix();
     glTranslatef(projetil->pos[0],projetil->pos[1],0.0);
@@ -1263,11 +1265,25 @@ static void display(void)
 
     // Exibe instrucoes so por um determinado tempo
     if(tempoInstrucoes > 0.0){
-        // Exibe as instrucoes de entrada
-        PrintTxtTela((20*(0.5*ScreenWidth)/ScreenWidth)-13,-5,"Instrucoes basicas:");
-        PrintTxtTela((20*(0.5*ScreenWidth)/ScreenWidth)-18,-7,"Para se movimentar use as teclas (W,A,S,D)");
-        PrintTxtTela((20*(0.5*ScreenWidth)/ScreenWidth)-18,-8,"Para atirar utilize a tecla (K)");
-        PrintTxtTela((20*(0.5*ScreenWidth)/ScreenWidth)-12,-10,"Aguarde...");
+        if(tempoInstrucoes > 14.0){
+            PrintTxtTela((20*(0.5*ScreenWidth)/ScreenWidth)-18,-5,"Numa cidade muito distante chamada Propolis,");
+            PrintTxtTela((20*(0.5*ScreenWidth)/ScreenWidth)-20,-7,"Muitos inimigos se disfarcaram em estruturas classicas,");
+            PrintTxtTela((20*(0.5*ScreenWidth)/ScreenWidth)-20,-8,"aterrorizando vizinhancas nas noites escuras sem deixar rastros.");
+        }
+        else if(tempoInstrucoes > 5.0){
+            PrintTxtTela((20*(0.5*ScreenWidth)/ScreenWidth)-20,-5,"Com avanco da tecnologia foi possivel revelar seus disfarces,");
+            PrintTxtTela((20*(0.5*ScreenWidth)/ScreenWidth)-20,-6,"com isso, guerreiros se mobilizaram contra esse mal.");
+            PrintTxtTela((20*(0.5*ScreenWidth)/ScreenWidth)-20,-9,"Mas cuidado!, entre os maus existem estruturas boas tambem!");
+            PrintTxtTela((20*(0.5*ScreenWidth)/ScreenWidth)-20,-11,"Ao derrotalas voce perderá vida decorrente de tal erro. ");
+        }
+        else{
+            // Exibe as instrucoes de entrada
+            PrintTxtTela((20*(0.5*ScreenWidth)/ScreenWidth)-13,-5,"Instrucoes basicas:");
+            PrintTxtTela((20*(0.5*ScreenWidth)/ScreenWidth)-18,-7,"Para se movimentar use as teclas (W,A,S,D)");
+            PrintTxtTela((20*(0.5*ScreenWidth)/ScreenWidth)-18,-8,"Para atirar utilize a tecla (K)");
+       //     PrintTxtTela((20*(0.5*ScreenWidth)/ScreenWidth)-12,-10,"Aguarde...");
+        }
+
 
         // Carrega um fundo preto
         apresentaInstrucoes();
