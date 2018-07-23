@@ -429,44 +429,47 @@ Particula projetil[qtdTiros];
 
 void colisoesDoMapa(){
     // Definindo colisoes do mapa
-    adicionaColisaoMapa(&colisaoMapa[0],0, 0.0f, 16.0f);
-    adicionaColisaoMapa(&colisaoMapa[1],1, -3.0f, 16.0f);
-    adicionaColisaoMapa(&colisaoMapa[2],2, -6.0f, 14.0f);
-    adicionaColisaoMapa(&colisaoMapa[3],3, -9.0f, 13.0f);
+
+    adicionaColisaoMapa(&colisaoMapa[1],1, 16.0f, 3.0f);
+    adicionaColisaoMapa(&colisaoMapa[2],2, 15.0f, 7.0f);
+    adicionaColisaoMapa(&colisaoMapa[3],3, 13.0f, 9.0f);
+    adicionaColisaoMapa(&colisaoMapa[4],4, 12.0f, 11.0f);
+    adicionaColisaoMapa(&colisaoMapa[5],5, 9.0f, 14.0f);
+    adicionaColisaoMapa(&colisaoMapa[6],6, 6.0f, 15.0f);
+    adicionaColisaoMapa(&colisaoMapa[7],7, 3.0f, 16.0f);
+
+    adicionaColisaoMapa(&colisaoMapa[8],8, 0.0f, 16.0f);
+    adicionaColisaoMapa(&colisaoMapa[9],9, -3.0f, 16.0f);
+    adicionaColisaoMapa(&colisaoMapa[10],10, -6.0f, 14.0f);
+    adicionaColisaoMapa(&colisaoMapa[11],11, -9.0f, 13.0f);
 
 
-    adicionaColisaoMapa(&colisaoMapa[4],4, -11.0f, 11.0f);
-    adicionaColisaoMapa(&colisaoMapa[5],5, -13.0f, 9.0f);
-    adicionaColisaoMapa(&colisaoMapa[6],6, -15.0f, 6.0f);
-    adicionaColisaoMapa(&colisaoMapa[7],7, -16.0f, 3.0f);
-    adicionaColisaoMapa(&colisaoMapa[8],8, -16.0f, 0.0f);
-    adicionaColisaoMapa(&colisaoMapa[9],9, -16.0f, -3.0f);
-    adicionaColisaoMapa(&colisaoMapa[10],10, -15.0f, -6.0f);
+    adicionaColisaoMapa(&colisaoMapa[12],12, -11.0f, 11.0f);
+    adicionaColisaoMapa(&colisaoMapa[13],13, -13.0f, 9.0f);
+    adicionaColisaoMapa(&colisaoMapa[14],14, -15.0f, 6.0f);
+    adicionaColisaoMapa(&colisaoMapa[15],15, -16.0f, 3.0f);
+    adicionaColisaoMapa(&colisaoMapa[16],16, -16.0f, 0.0f);
+    adicionaColisaoMapa(&colisaoMapa[17],17, -16.0f, -3.0f);
+    adicionaColisaoMapa(&colisaoMapa[18],18, -15.0f, -6.0f);
 
-    adicionaColisaoMapa(&colisaoMapa[11],11, -14.0f, -9.0f);
-    adicionaColisaoMapa(&colisaoMapa[12],12, -12.0f, -12.0f);
-    adicionaColisaoMapa(&colisaoMapa[13],13, -9.0f, -14.0f);
-    adicionaColisaoMapa(&colisaoMapa[14],14, -6.0f, -14.0f);
+    adicionaColisaoMapa(&colisaoMapa[19],19, -14.0f, -9.0f);
+    adicionaColisaoMapa(&colisaoMapa[20],20, -12.0f, -12.0f);
+    adicionaColisaoMapa(&colisaoMapa[21],21, -9.0f, -14.0f);
+    adicionaColisaoMapa(&colisaoMapa[22],22, -6.0f, -14.0f);
 
-    adicionaColisaoMapa(&colisaoMapa[15],15, -3.0f, -15.0f);
-    adicionaColisaoMapa(&colisaoMapa[16],16, 0.0f, -16.0f);
-    adicionaColisaoMapa(&colisaoMapa[17],17, 3.0f, -15.0f);
-    adicionaColisaoMapa(&colisaoMapa[18],18, 6.0f, -15.0f);
-    adicionaColisaoMapa(&colisaoMapa[19],19, 9.0f, -14.0f);
+    adicionaColisaoMapa(&colisaoMapa[23],23, -3.0f, -15.0f);
+    adicionaColisaoMapa(&colisaoMapa[24],24, 0.0f, -16.0f);
+    adicionaColisaoMapa(&colisaoMapa[25],25, 3.0f, -15.0f);
+    adicionaColisaoMapa(&colisaoMapa[26],26, 6.0f, -15.0f);
+    adicionaColisaoMapa(&colisaoMapa[27],27, 9.0f, -14.0f);
 
-    adicionaColisaoMapa(&colisaoMapa[20],20, 12.0f, -12.0f);
-    adicionaColisaoMapa(&colisaoMapa[21],21, 14.0f, -9.0f);
-    adicionaColisaoMapa(&colisaoMapa[22],22, 16.0f, -6.0f);
-    adicionaColisaoMapa(&colisaoMapa[23],23, 16.0f, -3.0f);
-    adicionaColisaoMapa(&colisaoMapa[24],24, 17.0f, 0.0f);
+    adicionaColisaoMapa(&colisaoMapa[28],28, 12.0f, -12.0f);
+    adicionaColisaoMapa(&colisaoMapa[29],29, 14.0f, -9.0f);
+    adicionaColisaoMapa(&colisaoMapa[30],30, 16.0f, -6.0f);
+    adicionaColisaoMapa(&colisaoMapa[31],31, 16.0f, -3.0f);
+    adicionaColisaoMapa(&colisaoMapa[32],32, 17.0f, 0.0f);
 
-    adicionaColisaoMapa(&colisaoMapa[25],25, 16.0f, 3.0f);
-    adicionaColisaoMapa(&colisaoMapa[26],26, 15.0f, 7.0f);
-    adicionaColisaoMapa(&colisaoMapa[27],27, 13.0f, 9.0f);
-    adicionaColisaoMapa(&colisaoMapa[28],28, 12.0f, 11.0f);
-    adicionaColisaoMapa(&colisaoMapa[29],29, 9.0f, 14.0f);
-    adicionaColisaoMapa(&colisaoMapa[30],30, 6.0f, 15.0f);
-    adicionaColisaoMapa(&colisaoMapa[31],31, 3.0f, 16.0f);
+
 }
 // ######## Fim definições tiro ###########+
 
@@ -487,7 +490,7 @@ bool objetoColidiu(struct posColisaoMapa *colisoesMapa, float xObj, float yObj){
 }
 
 // Comparacao de colisao de objeto baseada em caixa AABB
-bool comparaTodasColisoes(struct caixaColisao comparaCaixa){
+int comparaTodasColisoes(struct caixaColisao comparaCaixa){
     /*
         A funcao comparaTodasColisoes verifica comparando todas as caixas
         de colisao do mapa com a caixa passada como referencia, para ver
@@ -499,10 +502,10 @@ bool comparaTodasColisoes(struct caixaColisao comparaCaixa){
         if(checaColisaoBox(comparaCaixa,colisaoMapa[i])){
             // Obtem o id do objeto em que ocorreu a colisao
             printf("Id obj colisao %d", colisaoMapa[i].idObj);
-            return true;
+            return colisaoMapa[i].idObj;
        }
     }
-    return false;
+    return -1;
 }
 
 // ### Inicio definicoes de textura ###
@@ -1297,12 +1300,12 @@ void updateProjetil(struct Particula *projetil){
     projetil->caixa.pos[0] = projetil->pos[0];
     projetil->caixa.pos[1] = projetil->pos[1];
 
-
+    int resultColisao = comparaTodasColisoes(projetil->caixa);
     // Verifica se colidiu antes de desenhar a proxima
-    if(comparaTodasColisoes(projetil->caixa)){
+    if(resultColisao != -1){
         GerenciamentoDeInstanciamentoFonteDeParticulas(projetil->caixa.pos[0],projetil->caixa.pos[1],0.0f,0.3f);
         // Mata a caixa atingida
-        GerenciamentoObjetosMortos(1);
+        GerenciamentoObjetosMortos(resultColisao);
         projetil->tempoDeVida = 0.0f;
     }
 
@@ -1488,7 +1491,7 @@ static void display(void)
 
 
     //if(checaColisaoBox(personagem,teste1)){
-    if(comparaTodasColisoes(personagem)){
+    if(comparaTodasColisoes(personagem) != -1){
         printf("Colidiu");
     }
     else{
@@ -1563,7 +1566,7 @@ static void key(unsigned char key, int xx, int yy)
 			z += lz ;
 
 			//if(objetoColidiu(&colisoesMapa[2], x, z)){
-			if(comparaTodasColisoes(personagem)){
+			if(comparaTodasColisoes(personagem) != -1){
                 x -= lx ;
                 z -= lz ;
 			}
