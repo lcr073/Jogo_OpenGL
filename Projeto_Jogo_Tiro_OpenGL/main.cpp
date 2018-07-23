@@ -297,6 +297,13 @@ float img[]= {
 
 // ### Inicio definicoes de estruturas ###
 
+// Criando uma estrutura para colisoes de caixa (bounded box)
+struct caixaColisao{
+    // A posicao sera considerada como um quadrado de colisao
+    float pos[2];
+    float largura,altura;
+};
+
 // Criando um (estrutura) objeto de particula
 struct Particula{
     float pos[3];
@@ -309,6 +316,9 @@ struct Particula{
 
     // angulo de movimentacao
     float angulo_sentido;
+
+    // Adiciona um elemento para particulas que tem colisao a se avaliada
+    caixaColisao caixa;
 };
 
 // Criando uma estrutura para a fonte de particulas
@@ -361,13 +371,6 @@ struct posColisaoMapa{
 };
 
 posColisaoMapa colisoesMapa[10];
-
-// Criando uma estrutura para colisoes de caixa (bounded box)
-struct caixaColisao{
-    // A posicao sera considerada como um quadrado de colisao
-    float pos[2];
-    float largura,altura;
-};
 
 const int nCaixasColisoes = 35;
 // Vetor de colisoes possiveis no mapa
@@ -1143,14 +1146,15 @@ void UpdateFonteDeParticula(){
 
 // ### Inicio de definicoes de tela de introducao do jogo ###
 float tempoInstrucoes = 23.0f;
+//float tempoInstrucoes = 2.0f;
 
 // Funcao para escrever texto na tela
-void PrintTxtTela( int x, int y, char *st)
+void PrintTxtTela( int x, int y, char *st){
 /*
     A funcao PrintTxtTela recebe uma string e exibe
     na tela em alguma posicao especifica
 */
-{
+
 int l,i;
 glPushMatrix();
 glColor3f(1.0f,1.0f,1.0f);
@@ -1181,6 +1185,12 @@ void apresentaInstrucoes(){
 
 
 void atira(struct Particula *projetil, float balaPosIniX, float balaPosIniY, float balaPoslxDisp, float balaPoslyDisp){
+    /*
+        [Deprecada]
+        A funcao atira é responsavel por verificar se o jogador ainda possui municao
+        para realizar disparos e caso tenha instancia um projetil na mesma posicao do
+        mesmo com a rotacao correta
+    */
     // Nao tem mais balas entao nao atira
     if(qtdTirosRestantes <= 0){
 
@@ -1193,6 +1203,12 @@ void atira(struct Particula *projetil, float balaPosIniX, float balaPosIniY, flo
         projetil->pos[0] = balaPosIniX;
         // posicao y
         projetil->pos[1] = balaPosIniY;
+
+        // Definicoes de colisao do projetil
+        projetil->caixa.altura = 1.0f;
+        projetil->caixa.largura = 1.0f;
+        projetil->caixa.pos[0] = balaPosIniX;
+        projetil->caixa.pos[1] = balaPosIniY;
 
         // Instancia particulas na posicao do disparo
         GerenciamentoDeInstanciamentoFonteDeParticulas(balaPosIniX,balaPosIniY,0.0f,0.3f);
@@ -1211,6 +1227,11 @@ void atira(struct Particula *projetil, float balaPosIniX, float balaPosIniY, flo
 
 // Realiza as atualizações da posiçao do projetil
 void updateProjetil(struct Particula *projetil){
+    /*
+        A funcao updateProjetil e responsavel por pegar uma referencia de projetil
+        e ir atualizando sua posicao verificando sempre se ela colidiu
+    */
+
     // Manda o projetil para frente de acordo com sua posicao atual e angulo
     // obtem o sentido atraves do angulo
     float lx2 = sin(projetil->angulo_sentido);
@@ -1220,7 +1241,16 @@ void updateProjetil(struct Particula *projetil){
     projetil->pos[0] = projetil->pos[0] + lx2;
     projetil->pos[1] = projetil->pos[1] + lz2;
 
+    // Vai atualizando a posicao da caixa de colisao do projetil
+    projetil->caixa.pos[0] = projetil->pos[0];
+    projetil->caixa.pos[1] = projetil->pos[1];
+
+
     // Verifica se colidiu antes de desenhar a proxima
+    if(comparaTodasColisoes(projetil->caixa)){
+        GerenciamentoDeInstanciamentoFonteDeParticulas(projetil->caixa.pos[0],projetil->caixa.pos[1],0.0f,0.3f);
+        projetil->tempoDeVida = 0.0f;
+    }
 
     // Instancia o projetil
     glPushMatrix();
@@ -1229,6 +1259,99 @@ void updateProjetil(struct Particula *projetil){
     glPopMatrix();
 }
 
+int GerenciamentoDeInstanciamentoProjetil(float xProj, float yProj, float zProj,float tempoDeVidaProj){
+    /*
+    A funcao GerenciamentoDeInstanciamentoProjetil permite
+    atualiza a struct de particulas existentes
+     atraves da definicao da posicao do sistema e do tempo de vida,
+    alocando no vetor de sistema ja existente na melhor posicao, ou substituindo caso
+    ja tenha ultrapassado seu limite.
+
+    Retornos: 0 -> Tinha espaco no sistema
+              1 -> Sistema lotado e algum sistema substituido
+    */
+
+    // Guarda o indice do sistema
+    int indexProjeteis = 0;
+    float tempoVidaProjetil = 100.0f;
+
+    // Varre todo o vetor de sistema projeteis
+    for(int i = 0; i < qtdTiros; i++){
+
+        // Analisa se o a posicao de projetil ja esta "morto"
+        // Sistema esta morto
+        if((projetil[i].tempoDeVida) == 0.0f){
+            // Cria um sistema nesse indice
+            projetil[i].pos[0] = xProj;
+            projetil[i].pos[1] = yProj;
+            projetil[i].pos[2] = zProj;
+
+            // Definicoes de colisao do projetil
+            projetil[i].caixa.altura = 1.0f;
+            projetil[i].caixa.largura = 1.0f;
+            projetil[i].caixa.pos[0] = xProj;
+            projetil[i].caixa.pos[1] = yProj;
+
+            // Armazena trajetoria
+            projetil[i].angulo_sentido = angle;
+            projetil[i].tempoDeVida = tempoDeVidaProj;
+
+        // Instancia particulas na posicao do disparo
+        GerenciamentoDeInstanciamentoFonteDeParticulas(xProj,yProj,0.0f,0.3f);
+
+            return 0;
+        }
+        // Sistema ainda esta vivo
+        else{
+            if(tempoVidaProjetil > projetil[i].tempoDeVida){
+                // Guarda o indice desse sistema e seu tempo de vida para ver se sera substituido
+                indexProjeteis = i;
+                tempoVidaProjetil = projetil[i].tempoDeVida;
+            }
+        }
+    }
+    // O vetor de projeteis esta lotado se saiu do for
+    // Cria um projetil no indice de sistema q tem o menor tempo de vida
+            projetil[indexProjeteis].pos[0] = xProj;
+            projetil[indexProjeteis].pos[1] = yProj;
+            projetil[indexProjeteis].pos[2] = zProj;
+            projetil[indexProjeteis].angulo_sentido = angle;
+            projetil[indexProjeteis].tempoDeVida = tempoDeVidaProj;
+
+            // Definicoes de colisao do projetil
+            projetil[indexProjeteis].caixa.altura = 1.0f;
+            projetil[indexProjeteis].caixa.largura = 1.0f;
+            projetil[indexProjeteis].caixa.pos[0] = xProj;
+            projetil[indexProjeteis].caixa.pos[1] = yProj;
+
+            // Instancia particulas na posicao do disparo
+            GerenciamentoDeInstanciamentoFonteDeParticulas(xProj,yProj,0.0f,0.3f);
+        return 1;
+}
+
+void ControlaProjeteis(){
+    /*
+        ControlaProjeteis e uma funcao que tem por objetivo
+        varrer todo o vetor de projeteis disponiveis, caso tenha
+        projeteis ativos, reduz seu respectivo tempo de vida e desenha
+        naquele frame e caso esteja morto, para de desenhar e arredonda
+        seu valor para 0.0
+    */
+    // Varre todo o vetor de sistema de projeteis
+    for(int i = 0; i < qtdTiros; i++){
+        if(projetil[i].tempoDeVida > 0.0f){
+
+            // Decrementa o tempo de vida do sistema de emissao de particula pelo tempo do ultimo update de frame
+            projetil[i].tempoDeVida = projetil[i].tempoDeVida - tempo_gasto;
+
+            // Desenha a fonte para aquele frame
+            updateProjetil(&projetil[i]);
+        }
+        else{
+            projetil[i].tempoDeVida = 0.0f;
+        }
+    }
+}
 /* GLUT callback Handlers */
 
 static void resize(int width, int height)
@@ -1328,16 +1451,8 @@ static void display(void)
     // Ativa sistema que fica desenhando as particulas
     UpdateFonteDeParticula();
 
-    if(atirou == true){
-        atira(&projetil[1],balaPosIniX,balaPosIniY,balaPoslxDisp, balaPoslyDisp);
-    }
-
-    updateProjetil(&projetil[1]);
-
-
-  //  eixos(10.0);
-
-
+    // Sistema de controle de projeteis disparados
+    ControlaProjeteis();
 
     //termina de rodar o mundo
     glPopMatrix();
@@ -1370,6 +1485,7 @@ static void key(unsigned char key, int xx, int yy)
 
                     atirou = true;
                     if(qtdTirosRestantes > 0){
+                        GerenciamentoDeInstanciamentoProjetil(x,z,0,1);
                         qtdTirosRestantes = qtdTirosRestantes - 1;
                     }
 
@@ -1507,3 +1623,4 @@ int main(int argc, char *argv[])
 
     return EXIT_SUCCESS;
 }
+
