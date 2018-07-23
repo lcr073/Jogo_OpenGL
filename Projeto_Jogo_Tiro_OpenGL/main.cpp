@@ -302,6 +302,8 @@ struct caixaColisao{
     // A posicao sera considerada como um quadrado de colisao
     float pos[2];
     float largura,altura;
+    // Utilizado para sabe em qual objeto ocorreu a colisao
+    int idObj;
 };
 
 // Criando um (estrutura) objeto de particula
@@ -392,13 +394,14 @@ bool checaColisaoBox(struct caixaColisao colBox1, struct caixaColisao colBox2){
     }
 }
 
-void adicionaColisaoMapa(struct caixaColisao *caixa, float x, float y){
+void adicionaColisaoMapa(struct caixaColisao *caixa,int idObjColisao, float x, float y){
 /*
     A funcao adicionaColisaoMapa e utilizada para adicionar caixas
     de colisao dentro do mapa
     struct caixaColisao, float x, float y
 */
 
+    caixa->idObj = idObjColisao;
     caixa->altura = 1.0f;
     caixa->largura = 1.0f;
     caixa->pos[0] = x;
@@ -417,48 +420,46 @@ Particula projetil[qtdTiros];
 
 void colisoesDoMapa(){
     // Definindo colisoes do mapa
-    adicionaColisaoMapa(&colisaoMapa[0], 0.0f, 16.0f);
-    adicionaColisaoMapa(&colisaoMapa[1], -3.0f, 16.0f);
-    adicionaColisaoMapa(&colisaoMapa[2], -6.0f, 14.0f);
-    adicionaColisaoMapa(&colisaoMapa[3], -9.0f, 13.0f);
+    adicionaColisaoMapa(&colisaoMapa[0],0, 0.0f, 16.0f);
+    adicionaColisaoMapa(&colisaoMapa[1],1, -3.0f, 16.0f);
+    adicionaColisaoMapa(&colisaoMapa[2],2, -6.0f, 14.0f);
+    adicionaColisaoMapa(&colisaoMapa[3],3, -9.0f, 13.0f);
 
 
-    adicionaColisaoMapa(&colisaoMapa[4], -11.0f, 11.0f);
-    adicionaColisaoMapa(&colisaoMapa[5], -13.0f, 9.0f);
-    adicionaColisaoMapa(&colisaoMapa[6], -15.0f, 6.0f);
-    adicionaColisaoMapa(&colisaoMapa[7], -16.0f, 3.0f);
-    adicionaColisaoMapa(&colisaoMapa[8], -16.0f, 0.0f);
-    adicionaColisaoMapa(&colisaoMapa[9], -16.0f, -3.0f);
-    adicionaColisaoMapa(&colisaoMapa[10], -15.0f, -6.0f);
+    adicionaColisaoMapa(&colisaoMapa[4],4, -11.0f, 11.0f);
+    adicionaColisaoMapa(&colisaoMapa[5],5, -13.0f, 9.0f);
+    adicionaColisaoMapa(&colisaoMapa[6],6, -15.0f, 6.0f);
+    adicionaColisaoMapa(&colisaoMapa[7],7, -16.0f, 3.0f);
+    adicionaColisaoMapa(&colisaoMapa[8],8, -16.0f, 0.0f);
+    adicionaColisaoMapa(&colisaoMapa[9],9, -16.0f, -3.0f);
+    adicionaColisaoMapa(&colisaoMapa[10],10, -15.0f, -6.0f);
 
-    adicionaColisaoMapa(&colisaoMapa[11], -14.0f, -9.0f);
-    adicionaColisaoMapa(&colisaoMapa[12], -12.0f, -12.0f);
-    adicionaColisaoMapa(&colisaoMapa[13], -9.0f, -14.0f);
-    adicionaColisaoMapa(&colisaoMapa[14], -6.0f, -14.0f);
+    adicionaColisaoMapa(&colisaoMapa[11],11, -14.0f, -9.0f);
+    adicionaColisaoMapa(&colisaoMapa[12],12, -12.0f, -12.0f);
+    adicionaColisaoMapa(&colisaoMapa[13],13, -9.0f, -14.0f);
+    adicionaColisaoMapa(&colisaoMapa[14],14, -6.0f, -14.0f);
 
-    adicionaColisaoMapa(&colisaoMapa[15], -3.0f, -15.0f);
-    adicionaColisaoMapa(&colisaoMapa[16], 0.0f, -16.0f);
-    adicionaColisaoMapa(&colisaoMapa[17], 3.0f, -15.0f);
-    adicionaColisaoMapa(&colisaoMapa[18], 6.0f, -15.0f);
-    adicionaColisaoMapa(&colisaoMapa[19], 9.0f, -14.0f);
+    adicionaColisaoMapa(&colisaoMapa[15],15, -3.0f, -15.0f);
+    adicionaColisaoMapa(&colisaoMapa[16],16, 0.0f, -16.0f);
+    adicionaColisaoMapa(&colisaoMapa[17],17, 3.0f, -15.0f);
+    adicionaColisaoMapa(&colisaoMapa[18],18, 6.0f, -15.0f);
+    adicionaColisaoMapa(&colisaoMapa[19],19, 9.0f, -14.0f);
 
-    adicionaColisaoMapa(&colisaoMapa[20], 12.0f, -12.0f);
-    adicionaColisaoMapa(&colisaoMapa[21], 14.0f, -9.0f);
-    adicionaColisaoMapa(&colisaoMapa[22], 16.0f, -6.0f);
-    adicionaColisaoMapa(&colisaoMapa[23], 16.0f, -3.0f);
-    adicionaColisaoMapa(&colisaoMapa[24], 17.0f, 0.0f);
+    adicionaColisaoMapa(&colisaoMapa[20],20, 12.0f, -12.0f);
+    adicionaColisaoMapa(&colisaoMapa[21],21, 14.0f, -9.0f);
+    adicionaColisaoMapa(&colisaoMapa[22],22, 16.0f, -6.0f);
+    adicionaColisaoMapa(&colisaoMapa[23],23, 16.0f, -3.0f);
+    adicionaColisaoMapa(&colisaoMapa[24],24, 17.0f, 0.0f);
 
-    adicionaColisaoMapa(&colisaoMapa[25], 16.0f, 3.0f);
-    adicionaColisaoMapa(&colisaoMapa[26], 15.0f, 7.0f);
-    adicionaColisaoMapa(&colisaoMapa[27], 13.0f, 9.0f);
-    adicionaColisaoMapa(&colisaoMapa[28], 12.0f, 11.0f);
-    adicionaColisaoMapa(&colisaoMapa[29], 9.0f, 14.0f);
-    adicionaColisaoMapa(&colisaoMapa[30], 6.0f, 15.0f);
-    adicionaColisaoMapa(&colisaoMapa[31], 3.0f, 16.0f);
-
-
+    adicionaColisaoMapa(&colisaoMapa[25],25, 16.0f, 3.0f);
+    adicionaColisaoMapa(&colisaoMapa[26],26, 15.0f, 7.0f);
+    adicionaColisaoMapa(&colisaoMapa[27],27, 13.0f, 9.0f);
+    adicionaColisaoMapa(&colisaoMapa[28],28, 12.0f, 11.0f);
+    adicionaColisaoMapa(&colisaoMapa[29],29, 9.0f, 14.0f);
+    adicionaColisaoMapa(&colisaoMapa[30],30, 6.0f, 15.0f);
+    adicionaColisaoMapa(&colisaoMapa[31],31, 3.0f, 16.0f);
 }
-// ######## Fim definições tiro ###########
+// ######## Fim definições tiro ###########+
 
 // Comparacao de colisao de objeto baseado em cordenada
 bool objetoColidiu(struct posColisaoMapa *colisoesMapa, float xObj, float yObj){
@@ -487,6 +488,8 @@ bool comparaTodasColisoes(struct caixaColisao comparaCaixa){
     for(int i=0; i<nCaixasColisoes;i++){
         // Caso ocorreu alguma colisao
         if(checaColisaoBox(comparaCaixa,colisaoMapa[i])){
+            // Obtem o id do objeto em que ocorreu a colisao
+            printf("Id obj colisao %d", colisaoMapa[i].idObj);
             return true;
        }
     }
@@ -1145,8 +1148,8 @@ void UpdateFonteDeParticula(){
 // ### FIM DEFINICOES PARTICULAS ###
 
 // ### Inicio de definicoes de tela de introducao do jogo ###
-float tempoInstrucoes = 23.0f;
-//float tempoInstrucoes = 2.0f;
+//float tempoInstrucoes = 23.0f;
+float tempoInstrucoes = 2.0f;
 
 // Funcao para escrever texto na tela
 void PrintTxtTela( int x, int y, char *st){
