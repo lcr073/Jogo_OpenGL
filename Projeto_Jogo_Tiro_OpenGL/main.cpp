@@ -299,11 +299,12 @@ float img[]= {
 
 // Criando uma estrutura para colisoes de caixa (bounded box)
 struct caixaColisao{
+    // Utilizado para sabe em qual objeto ocorreu a colisao
+    int idObj;
+
     // A posicao sera considerada como um quadrado de colisao
     float pos[2];
     float largura,altura;
-    // Utilizado para sabe em qual objeto ocorreu a colisao
-    int idObj;
 };
 
 // Criando um (estrutura) objeto de particula
@@ -374,9 +375,17 @@ struct posColisaoMapa{
 
 posColisaoMapa colisoesMapa[10];
 
-const int nCaixasColisoes = 35;
 // Vetor de colisoes possiveis no mapa
+const int nCaixasColisoes = 35;
+
 caixaColisao colisaoMapa[nCaixasColisoes];
+
+struct objeto{
+ int idObj;
+ float posAngObj;
+};
+
+objeto objetosMortos[nCaixasColisoes];
 
 bool checaColisaoBox(struct caixaColisao colBox1, struct caixaColisao colBox2){
     /*
@@ -848,18 +857,37 @@ void eixos(float T)
     glEnd();
 };
 
+bool testeComparaMortos(float f){
+    /*
+    A funcao testeComparaMortos decide quais elementos do stone range nao
+    deverao mais ser desenhados pois estao mortos
+    */
+    for(int i =0; i< nCaixasColisoes; i++){
+        if(f == (objetosMortos[i].idObj) * (objetosMortos[i].posAngObj)){
+            return true;
+        }
+    }
+        return false;
+}
 void BaseCirculo(){
     float umin = 0;
     float umax = 360;
     float du = (umax-umin)/32;
       // float du = 4 * M_PI / 180;
     float i;
+    int v = 0;
     i = umin;
 
     // Definindo as dimensos do cubo
     //glScaled(1.0,2.0,4.0);
 
     while(i <= umax){
+        // Analisa se esse elemento esta morto e entao nao desenha mais
+       if( testeComparaMortos(i)){
+
+        }
+        else
+        {
             glPushMatrix();
                 glRotated(i,0,0,1);
                 glTranslated(16,0,2.0);
@@ -867,6 +895,7 @@ void BaseCirculo(){
 
                 desenhaCubo();
             glPopMatrix();
+        }
         i = i + du;
     }
 }
@@ -1186,6 +1215,26 @@ void apresentaInstrucoes(){
 
 // ### Fim de definicoes de tela de introducao do jogo ###
 
+int GerenciamentoObjetosMortos(int idObjMorto){
+    /*
+    A funcao GerenciamentoObjetosMortos permite a inclusao
+    de novos objetos que morreram decorrente de colisoes e
+    fazendo assim parar de renderizalos
+
+    Retornos: 0 -> Tinha espaco no sistema
+    */
+
+    // Varre todo o vetor de sistema projeteis
+    for(int i = 0; i < nCaixasColisoes; i++){
+        //  Essa posicao ainda nao foi instanciada
+        if((objetosMortos[i].posAngObj) == 0.0f){
+            // Cria um objeto nesse inice
+            objetosMortos[i].idObj = idObjMorto;
+            objetosMortos[i].posAngObj = 11.25f;
+            return 0;
+        }
+    }
+}
 
 void atira(struct Particula *projetil, float balaPosIniX, float balaPosIniY, float balaPoslxDisp, float balaPoslyDisp){
     /*
@@ -1252,6 +1301,8 @@ void updateProjetil(struct Particula *projetil){
     // Verifica se colidiu antes de desenhar a proxima
     if(comparaTodasColisoes(projetil->caixa)){
         GerenciamentoDeInstanciamentoFonteDeParticulas(projetil->caixa.pos[0],projetil->caixa.pos[1],0.0f,0.3f);
+        // Mata a caixa atingida
+        GerenciamentoObjetosMortos(1);
         projetil->tempoDeVida = 0.0f;
     }
 
@@ -1332,6 +1383,7 @@ int GerenciamentoDeInstanciamentoProjetil(float xProj, float yProj, float zProj,
         return 1;
 }
 
+
 void ControlaProjeteis(){
     /*
         ControlaProjeteis e uma funcao que tem por objetivo
@@ -1387,7 +1439,6 @@ static void display(void)
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-
 
     // Exibe instrucoes so por um determinado tempo
     if(tempoInstrucoes > 0.0){
