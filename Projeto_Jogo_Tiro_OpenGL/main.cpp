@@ -409,18 +409,21 @@ void geraInimigosRodada(){
         randomicos de 0 a 31 e preencher um vetor de inimigos,
         esses numeros gerados correspondem aos id's dos blocos inimigos
     */
-    for(int i = 0; i <= nInimigosRodada; i++){
+    // Muda a "semente" para gerar um numero aleatorio
+    srand(time(NULL));
+
+    for(int i = 0; i < nInimigosRodada; i++){
         idInimigosEscolhidos[i] = (rand() % 31);
 
         // Comparando para nao gerar inimigos repetidos
-        /*for(int j = 0; j <= i; j++){
+        for(int j = 0; j < i; j++){
             // Repetiu Id de inimigo
             if(idInimigosEscolhidos[j] == idInimigosEscolhidos[i]){
                 i = i - 1;
                 break;
             }
         }
-        */
+        // Mostra os ids dos inimigos criados
         printf("%d \n",idInimigosEscolhidos[i]);
     }
 }
