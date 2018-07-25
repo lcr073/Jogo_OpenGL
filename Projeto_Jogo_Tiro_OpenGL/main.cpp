@@ -41,6 +41,12 @@ int ptosAcertos = 0;
 // Variavel que bloqueia os movimentos do personagem (Principalmente ao acabar o jogo)
 int jogoTravado = 0;
 
+// Tempo de duracao da habilidade de flash
+const float qtdFlashtot = 3;
+int qtdFlash = qtdFlashtot;
+const float tempoDeFlash = 1.0f;
+float tempoFlash = tempoDeFlash;
+
 // Obtem a largura e altura da janela
 int ScreenWidth;
 int screenHeight;
@@ -341,6 +347,26 @@ struct Particula{
 // Definindo uma cte de numero de particulas
 const int nParticulas = 60;
 
+void Configura_Material_Base()
+{
+   // glColorMaterial(GL_FRONT,GL_DIFFUSE);
+// permite que a cor definida com glColor seja utilizada como material
+ // glEnable(GL_COLOR_MATERIAL);
+
+// definição dos coeficientes de reflexão do material
+// nesse exemplo o material não emite luz (ke = 0)
+//float ka[4] = {	0.329412f,0.223529f,0.027451f, 1.0};
+//float kd[4] = {0.780392f,0.568627f,0.113725f, 1.0};
+//float ks[4] = {0.992157f,0.941176f,0.807843f, 1.0};
+float ke[4] = {1.0, 0.0, 0.0, 1.0};
+int n = 0.4;
+//glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, ka);
+//glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, kd);
+//glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, ks);
+glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, ke);
+//glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, n * 128);
+}
+
 struct SistemaParticula{
     float pos[3];
     float tempoDeVidaSistema;
@@ -474,6 +500,19 @@ void adicionaColisaoMapa(struct caixaColisao *caixa,int idObjColisao, float x, f
     caixa->pos[1] = y;
 }
 
+void isolaColisoesMapa(){
+    /*
+    A funcao isolaColisoesMapa garante que nao tera
+    nenhuma caixa de colisao "fantasma" no ponto 0,0
+    jogando-as em uma area inacessivel do mapa
+    */
+    for(int i = 0; i <= nCaixasColisoes; i++){
+        colisaoMapa->idObj = 99;
+        colisaoMapa->pos[0] = 500.0f;
+        colisaoMapa->pos[1] = 500.0f;
+    }
+}
+
 void removeColisaoMapa(int idObjColisao){
 /*
     A funcao adicionaColisaoMapa e utilizada para adicionar caixas
@@ -482,7 +521,7 @@ void removeColisaoMapa(int idObjColisao){
 */
 
     for(int i=0; i < nCaixasColisoes; i++){
-        // Retira a colisao desse objeto
+        // Retira a colisao desse objeto colocando ela em um lugar inacessivel
         if(colisaoMapa[i].idObj == idObjColisao){
                 colisaoMapa[i].altura = 0.0f;
                 colisaoMapa[i].largura = 0.0f;
@@ -505,7 +544,6 @@ Particula projetil[qtdTiros];
 
 void colisoesDoMapa(){
     // Definindo colisoes do mapa
-
     adicionaColisaoMapa(&colisaoMapa[1],1, 16.0f, 3.0f);
     adicionaColisaoMapa(&colisaoMapa[2],2, 15.0f, 7.0f);
     adicionaColisaoMapa(&colisaoMapa[3],3, 13.0f, 9.0f);
@@ -842,6 +880,35 @@ void desenhaPlanoIntro(){
                 face();
 }
 
+void desenhaCuboPers(){
+                face();
+
+            glPushMatrix();
+                glRotated(90.0,0,0,1);
+                face();
+            glPopMatrix();
+
+            glPushMatrix();
+                glRotated(180.0,0,0,1);
+                face();
+            glPopMatrix();
+
+            glPushMatrix();
+                glRotated(270.0,0,0,1);
+                face();
+            glPopMatrix();
+
+            glPushMatrix();
+                glRotated(90,0,1,0);
+                face();
+            glPopMatrix();
+
+            glPushMatrix();
+                glRotated(-90,0,1,0);
+                face();
+            glPopMatrix();
+}
+
 void desenhaCubo(){
             glColor3d(1,0,1);
                 face();
@@ -979,11 +1046,27 @@ void BaseCirculo(){
         else
         {
             glPushMatrix();
+
                 glRotated(i,0,0,1);
                 glTranslated(16,0,2.0);
             glScalef(1,1,4);
 
+        if(tempoFlash > 0.0f){
+            glColor3f(1.0f,0.0f,0.0f);
+
+            if(checaColidiuComInimigo(i/11.25f)){
+                glColor3f(1.0f,0.0f,0.0f);
+                desenhaCuboPers();
+            }
+            else
+            {
                 desenhaCubo();
+            }
+        }
+
+                desenhaCubo();
+
+
             glPopMatrix();
         }
         i = i + du;
@@ -1267,8 +1350,9 @@ void UpdateFonteDeParticula(){
 // ### FIM DEFINICOES PARTICULAS ###
 
 // ### Inicio de definicoes de tela de introducao do jogo ###
-float tempoInstrucoes = 23.0f;
-// float tempoInstrucoes = 2.0f;
+const float tempInst = 23.0f;
+float tempoInstrucoes = tempInst;
+//float tempoInstrucoes = 2.0f;
 
 // Funcao para escrever texto na tela
 void PrintTxtTela( int x, int y, char *st){
@@ -1340,7 +1424,6 @@ void encerramentoWinner(){
         desenhaPlanoIntro();
         glPopMatrix();
 }
-
 
 // ### Fim de definicoes de tela de introducao do jogo ###
 
@@ -1550,6 +1633,38 @@ void ControlaProjeteis(){
         }
     }
 }
+
+void Configura_Fonte_Refletora(float p[], float theta)
+{
+
+glEnable(GL_LIGHT1); // habilita o uso da fonte 0
+glEnable(GL_LIGHTING); // habilita o uso do modelo de iluminação
+
+// apaga completamente a luz ambiente padrão {0,0,0,1}
+float LAP[4] = {0.0, 0.0, 0.0, 1.0};
+glLightModelfv(GL_LIGHT_MODEL_AMBIENT, LAP);
+
+float d[3] = {0.0, 0.0, -1.0};              // Atenção! São apena 3 valores
+glLightfv(GL_LIGHT1, GL_POSITION, p);       // posição da fonte
+glLightfv(GL_LIGHT1, GL_SPOT_DIRECTION, d); // direção da fonte
+glLightf(GL_LIGHT1, GL_SPOT_CUTOFF, 25);    // ângulo da abertura do cone
+glLightf(GL_LIGHT1, GL_SPOT_EXPONENT, 1);   // fator de decaimento
+
+// definição das intensidades luminosas de cada componente
+// neste exemplo não há luz ambiente
+float la[4] = {0.0, 0.0, 0.0, 0.0};
+float ld[4] = {sin(theta), 1.0, cos(theta), 1.0};
+float ls[4] = {sin(theta)/2, sin(theta)/2, sin(theta)/2, 1.0};
+glLightfv(GL_LIGHT1, GL_AMBIENT, la);
+glLightfv(GL_LIGHT1, GL_DIFFUSE, ld);
+glLightfv(GL_LIGHT1, GL_SPECULAR, ls);
+
+// definição das constantes de atenuação atmosférica
+glLightf(GL_LIGHT1, GL_QUADRATIC_ATTENUATION, 0.0);
+glLightf(GL_LIGHT1, GL_LINEAR_ATTENUATION, 0.0);
+glLightf(GL_LIGHT1, GL_CONSTANT_ATTENUATION, 1.0);
+
+}
 /* GLUT callback Handlers */
 
 static void resize(int width, int height)
@@ -1600,7 +1715,7 @@ static void display(void)
     // Caso ele ganhou a partida
     else if(ptosAcertos == 5){
         PrintTxtTelaGameOver((20*(0.5*ScreenWidth)/ScreenWidth)-14,-4,"A CIDADE ESTA A SALVO !!!");
-        PrintTxtTelaGameOver((20*(0.5*ScreenWidth)/ScreenWidth)-18,-6,"Parabens sua determinacao conseguiu salvar a cidade,");
+        PrintTxtTelaGameOver((20*(0.5*ScreenWidth)/ScreenWidth)-18,-6,"Parabens, sua determinacao conseguiu salvar a cidade,");
         PrintTxtTelaGameOver((20*(0.5*ScreenWidth)/ScreenWidth)-18,-7,"das estruturas das trevas.");
 
         PrintTxtTelaGameOver((20*(0.5*ScreenWidth)/ScreenWidth)-18,-9,"Pressione a tecla (r) para jogar novamente.");
@@ -1662,7 +1777,16 @@ static void display(void)
     // Exibe no canto da tela o valor
     PrintTxtTela((20*(0.5*ScreenWidth)/ScreenWidth)-20,-11,strAcertos);
 
+    // Quantidade de flashs disponiveis
+    char strFlash[15];
+    // Concatena o inteiro de ptos de vida
+    sprintf(strFlash,"Qtd flashs: %d", qtdFlash);
+    // Exibe no canto da tela o valor
+    PrintTxtTela((20*(0.5*ScreenWidth)/ScreenWidth)-20,-12,strFlash);
+
     if(carregadasColisoesMapa == 0){
+        // Isolando caixas de colisoes para fora do mapa
+        isolaColisoesMapa();
         // Adicionando as caixas de colisoes do mapa
         colisoesDoMapa();
         carregadasColisoesMapa = 1;
@@ -1693,6 +1817,7 @@ static void display(void)
         glPushMatrix();
         printf("Posicao x: %f y: %f \n", x, z);
       //  RenderizarTextura(0.0f, 3.0f);
+
         BaseCirculo();
         chao();
 
@@ -1705,6 +1830,13 @@ static void display(void)
     //termina de rodar o mundo
     glPopMatrix();
     glutSwapBuffers();
+
+
+            if(tempoFlash > 0){
+                tempoFlash = tempoFlash - tempo_gasto;
+                printf("%d",tempoFlash);
+            }
+
 
     tempo_clock = clock() - tempo_clock;
 
@@ -1728,7 +1860,7 @@ static void key(unsigned char key, int xx, int yy)
                     // Retira todos objetos mortos do vetor
                     limpaMortos();
                     // Reinicia as instruções
-                    tempoInstrucoes = 23.0f;
+                    tempoInstrucoes = tempInst;
                     // Recarrega todas as colisoes do mapa
                     carregadasColisoesMapa = 0;
                     // Reinicia o tempo de vida
@@ -1746,10 +1878,17 @@ static void key(unsigned char key, int xx, int yy)
                     // Direcao da camera
                     lx = 0.0f;
                     lz = -1.0f;
+                    // Reinicia os flashs
+                    qtdFlash = qtdFlashtot;
                 break;
             }
             else{
-
+                case 'y' :
+                    if(qtdFlash > 0){
+                        qtdFlash = qtdFlash - 1;
+                        tempoFlash = tempoDeFlash;
+                    }
+                break;
 
                 case 'k' :
                     // Permite atirar se tiver municao
@@ -1775,7 +1914,7 @@ static void key(unsigned char key, int xx, int yy)
                     // Retira todos objetos mortos do vetor
                     limpaMortos();
                     // Reinicia as instruções
-                    tempoInstrucoes = 23.0f;
+                    tempoInstrucoes = tempInst;
                     // Recarrega todas as colisoes do mapa
                     carregadasColisoesMapa = 0;
                     // Reinicia o tempo de vida
@@ -1793,6 +1932,8 @@ static void key(unsigned char key, int xx, int yy)
                     // Direcao da camera
                     lx = 0.0f;
                     lz = -1.0f;
+                    // Reinicia os flashs
+                    qtdFlash = qtdFlashtot;
                 break;
 
             case 'd' :
@@ -1851,11 +1992,14 @@ static void idle(void)
     glutPostRedisplay();
 }
 
-const GLfloat light_ambient[]  = { 0.5f, 0.5f, 0.5f, 1.0f };
-//const GLfloat light_ambient[]  = { 0.0f, 0.0f, 0.0f, 1.0f };
+
+//const GLfloat light_ambient[]  = { 0.5f, 0.5f, 0.5f, 1.0f };
+const GLfloat light_ambient[]  = { 1.0f, 1.0f, 1.0f, 1.0f };
+//const GLfloat light_diffuse[]  = { 1.0f, 1.0f, 1.0f, 1.0f };
 const GLfloat light_diffuse[]  = { 1.0f, 1.0f, 1.0f, 1.0f };
 const GLfloat light_specular[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-const GLfloat light_position[] = { 2.0f, 5.0f, 5.0f, 0.0f };
+//const GLfloat light_position[] = { 2.0f, 5.0f, 5.0f, 0.0f };
+const GLfloat light_position[] = { 0.0f, 0.0f, 5.0f, 1.0f };
 
 
 const GLfloat mat_ambient[]    = { 0.7f, 0.7f, 0.7f, 1.0f };
@@ -1902,6 +2046,21 @@ int main(int argc, char *argv[])
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
 
+            // Ponto de iluminação
+            float d[4];
+            // posição da fonte pontual
+            d[0] = x;
+            d[1] = 0.0f;
+            d[2] = z;
+            d[3] = 1.0; // um ponto
+
+
+
+      //      Configura_Fonte_Refletora(d,angle);
+            glEnable(GL_COLOR_MATERIAL);
+
+ // Liga as luzes
+
     glEnable(GL_LIGHT0);
     glEnable(GL_NORMALIZE);
     glEnable(GL_COLOR_MATERIAL);
@@ -1911,6 +2070,7 @@ int main(int argc, char *argv[])
     glLightfv(GL_LIGHT0, GL_DIFFUSE,  light_diffuse);
     glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
     glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+
 
     glMaterialfv(GL_FRONT, GL_AMBIENT,   mat_ambient);
     glMaterialfv(GL_FRONT, GL_DIFFUSE,   mat_diffuse);
