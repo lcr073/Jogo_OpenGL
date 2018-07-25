@@ -1584,9 +1584,10 @@ static void display(void)
     if(ptosVida == 0){
         PrintTxtTelaGameOver((20*(0.5*ScreenWidth)/ScreenWidth)-14,-4,"GAME OVER");
         PrintTxtTelaGameOver((20*(0.5*ScreenWidth)/ScreenWidth)-18,-6,"Seus erros consumiram todas as suas vidas,");
-        PrintTxtTelaGameOver((20*(0.5*ScreenWidth)/ScreenWidth)-18,-7,"alem de sacrificar muitas estruturas boas");
+        PrintTxtTelaGameOver((20*(0.5*ScreenWidth)/ScreenWidth)-18,-7,"alem de sacrificar muitas estruturas boas !");
 
-        PrintTxtTelaGameOver((20*(0.5*ScreenWidth)/ScreenWidth)-18,-9,"Pressione a tecla R para jogar novamente");
+        PrintTxtTelaGameOver((20*(0.5*ScreenWidth)/ScreenWidth)-18,-9,"Pressione a tecla (r) para jogar novamente.");
+        PrintTxtTelaGameOver((20*(0.5*ScreenWidth)/ScreenWidth)-18,-11,"Obs: Cuidado para nao ativar o Caps Lock !");
         encerramentoGameOver();
 
         // Trava os movimentos do jogo
@@ -1595,11 +1596,12 @@ static void display(void)
     }
     // Caso ele ganhou a partida
     else if(ptosAcertos == 5){
-        PrintTxtTelaGameOver((20*(0.5*ScreenWidth)/ScreenWidth)-14,-4,"A CIDADE ESTA A SALVO");
+        PrintTxtTelaGameOver((20*(0.5*ScreenWidth)/ScreenWidth)-14,-4,"A CIDADE ESTA A SALVO !!!");
         PrintTxtTelaGameOver((20*(0.5*ScreenWidth)/ScreenWidth)-18,-6,"Parabens sua determinacao conseguiu salvar a cidade,");
         PrintTxtTelaGameOver((20*(0.5*ScreenWidth)/ScreenWidth)-18,-7,"das estruturas das trevas.");
 
-        PrintTxtTelaGameOver((20*(0.5*ScreenWidth)/ScreenWidth)-18,-9,"Pressione a tecla R para jogar novamente");
+        PrintTxtTelaGameOver((20*(0.5*ScreenWidth)/ScreenWidth)-18,-9,"Pressione a tecla (r) para jogar novamente.");
+        PrintTxtTelaGameOver((20*(0.5*ScreenWidth)/ScreenWidth)-18,-11,"Obs: Cuidado para nao ativar o Caps Lock !");
         encerramentoWinner();
 
         // Trava os movimentos do jogo
@@ -1626,7 +1628,7 @@ static void display(void)
             PrintTxtTela((20*(0.5*ScreenWidth)/ScreenWidth)-18,-8,"Para atirar utilize a tecla (k)");
             PrintTxtTela((20*(0.5*ScreenWidth)/ScreenWidth)-18,-9,"Para ativar o detector de estruturas do mal, tecla(y)");
             PrintTxtTela((20*(0.5*ScreenWidth)/ScreenWidth)-18,-11,"Para recomecar o desafio use a tecla (e)");
-            PrintTxtTela((20*(0.5*ScreenWidth)/ScreenWidth)-18,-12,"OBS: Cuidado para nao ativar o Caps Lock !");
+            PrintTxtTela((20*(0.5*ScreenWidth)/ScreenWidth)-18,-13,"OBS: Cuidado para nao ativar o Caps Lock !");
        //     PrintTxtTela((20*(0.5*ScreenWidth)/ScreenWidth)-12,-10,"Aguarde...");
         }
 
