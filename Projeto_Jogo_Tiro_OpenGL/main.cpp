@@ -29,6 +29,15 @@
 
 int bau = 1;
 
+// Variavel carregada no inicio do mapa
+int carregadasColisoesMapa = 0;
+
+// Determina os pontos de vida para definir quando morre
+int ptosVida = 5;
+
+// Variavel que guarda os pontos somados pelos usuario
+int ptosAcertos = 0;
+
 // Obtem a largura e altura da janela
 int ScreenWidth;
 int screenHeight;
@@ -387,6 +396,48 @@ struct objeto{
 
 objeto objetosMortos[nCaixasColisoes];
 
+// Vetor que contem a lista de inimigos randomicos gerados
+const int nInimigosRodada = 5;
+int idInimigosEscolhidos[nInimigosRodada];
+
+void geraInimigosRodada(){
+    /*
+        A funcao geraInimigosRodada e utilizada para gerar numeros
+        randomicos de 0 a 31 e preencher um vetor de inimigos,
+        esses numeros gerados correspondem aos id's dos blocos inimigos
+    */
+    for(int i = 0; i <= nInimigosRodada; i++){
+        idInimigosEscolhidos[i] = (rand() % 31);
+
+        // Comparando para nao gerar inimigos repetidos
+        /*for(int j = 0; j <= i; j++){
+            // Repetiu Id de inimigo
+            if(idInimigosEscolhidos[j] == idInimigosEscolhidos[i]){
+                i = i - 1;
+                break;
+            }
+        }
+        */
+        printf("%d \n",idInimigosEscolhidos[i]);
+    }
+}
+
+bool checaColidiuComInimigo(int idCol){
+    /*
+        A funcao checaColidiuComInimigo analisa se o id fornecido
+        era de um inimigo ou nao
+    */
+    for(int i = 0; i<= nInimigosRodada; i++){
+        // A colisao e com um inimigo
+        if(idInimigosEscolhidos[i] == idCol){
+           // printf("Era inimigo");
+            return true;
+        }
+    }
+    //printf("Nao era inimigo");
+    return false;
+}
+
 bool checaColisaoBox(struct caixaColisao colBox1, struct caixaColisao colBox2){
     /*
         A funcao checaColisaoBox verifica se houve uma intersecção entre 2 caixas,
@@ -415,6 +466,25 @@ void adicionaColisaoMapa(struct caixaColisao *caixa,int idObjColisao, float x, f
     caixa->largura = 1.0f;
     caixa->pos[0] = x;
     caixa->pos[1] = y;
+}
+
+void removeColisaoMapa(int idObjColisao){
+/*
+    A funcao adicionaColisaoMapa e utilizada para adicionar caixas
+    de colisao dentro do mapa
+    struct caixaColisao, float x, float y
+*/
+
+    for(int i=0; i < nCaixasColisoes; i++){
+        // Retira a colisao desse objeto
+        if(colisaoMapa[i].idObj == idObjColisao){
+                colisaoMapa[i].altura = 0.0f;
+                colisaoMapa[i].largura = 0.0f;
+                colisaoMapa[i].pos[0] = 500.0f;
+                colisaoMapa[i].pos[1] = 500.0f;
+
+        }
+    }
 }
 // ########## Fim definicoes de colisao ####
 
@@ -1181,7 +1251,7 @@ void UpdateFonteDeParticula(){
 
 // ### Inicio de definicoes de tela de introducao do jogo ###
 //float tempoInstrucoes = 23.0f;
-float tempoInstrucoes = 2.0f;
+ float tempoInstrucoes = 2.0f;
 
 // Funcao para escrever texto na tela
 void PrintTxtTela( int x, int y, char *st){
@@ -1226,7 +1296,6 @@ int GerenciamentoObjetosMortos(int idObjMorto){
 
     Retornos: 0 -> Tinha espaco no sistema
     */
-
     // Varre todo o vetor de sistema projeteis
     for(int i = 0; i < nCaixasColisoes; i++){
         //  Essa posicao ainda nao foi instanciada
@@ -1307,6 +1376,21 @@ void updateProjetil(struct Particula *projetil){
         // Mata a caixa atingida
         GerenciamentoObjetosMortos(resultColisao);
         projetil->tempoDeVida = 0.0f;
+        // Remove a caixa de colisao daquele objeto
+        removeColisaoMapa(resultColisao);
+
+        // Verifica se a colisao do projetil foi com inimigo
+        // Retorna true se o id for realmente de um inimigo
+        if(checaColidiuComInimigo(resultColisao)){
+            // Variavel que guarda os pontos somados pelos usuario
+            ptosAcertos = ptosAcertos + 1;
+        }
+        else{
+            // Perde pontos de vida
+            ptosVida = ptosVida - 1;
+        }
+
+
     }
 
     // Instancia o projetil
@@ -1461,6 +1545,7 @@ static void display(void)
             PrintTxtTela((20*(0.5*ScreenWidth)/ScreenWidth)-13,-5,"Instrucoes basicas:");
             PrintTxtTela((20*(0.5*ScreenWidth)/ScreenWidth)-18,-7,"Para se movimentar use as teclas (W,A,S,D)");
             PrintTxtTela((20*(0.5*ScreenWidth)/ScreenWidth)-18,-8,"Para atirar utilize a tecla (K)");
+            PrintTxtTela((20*(0.5*ScreenWidth)/ScreenWidth)-18,-9,"Para ativar o detector de estruturas do mal(Y)");
        //     PrintTxtTela((20*(0.5*ScreenWidth)/ScreenWidth)-12,-10,"Aguarde...");
         }
 
@@ -1470,14 +1555,35 @@ static void display(void)
     }
 
     // Desenha elementos do HUD
+    // Qtd tiros
     char strBuf[15];
     // Concatena o inteiro de qtd de tiros na string
     sprintf(strBuf,"Qtd tiros: %d",qtdTirosRestantes);
     // Exibe no canto da tela o valor
     PrintTxtTela((20*(0.5*ScreenWidth)/ScreenWidth)-20,-9,strBuf);
 
-    // Adicionando as caixas de colisoes do mapa
-    colisoesDoMapa();
+    // Pontos de Vida
+    char strVida[15];
+    // Concatena o inteiro de ptos de vida
+    sprintf(strVida,"Pontos de vida: %d", ptosVida);
+    // Exibe no canto da tela o valor
+    PrintTxtTela((20*(0.5*ScreenWidth)/ScreenWidth)-20,-10,strVida);
+
+    // Pontos de acertos
+    char strAcertos[15];
+    // Concatena o inteiro de ptos de vida
+    sprintf(strAcertos,"Acertos: %d", ptosAcertos);
+    // Exibe no canto da tela o valor
+    PrintTxtTela((20*(0.5*ScreenWidth)/ScreenWidth)-20,-11,strAcertos);
+
+    if(carregadasColisoesMapa == 0){
+        // Adicionando as caixas de colisoes do mapa
+        colisoesDoMapa();
+        carregadasColisoesMapa = 1;
+
+        // Gera os inimigos daquela rodada
+        geraInimigosRodada();
+    }
 
     // Cria personagem e sua caixa de colisao
     criaPersonagem();
@@ -1488,6 +1594,8 @@ static void display(void)
     teste1.largura = 1.0f;
     teste1.pos[0] = 0.0f;
     teste1.pos[1] = 16.0f;
+
+
 
 
     //if(checaColisaoBox(personagem,teste1)){

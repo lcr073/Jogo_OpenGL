@@ -29,6 +29,8 @@
 
 int bau = 1;
 
+int carregadasColisoesMapa = 0;
+
 // Obtem a largura e altura da janela
 int ScreenWidth;
 int screenHeight;
@@ -297,6 +299,16 @@ float img[]= {
 
 // ### Inicio definicoes de estruturas ###
 
+// Criando uma estrutura para colisoes de caixa (bounded box)
+struct caixaColisao{
+    // Utilizado para sabe em qual objeto ocorreu a colisao
+    int idObj;
+
+    // A posicao sera considerada como um quadrado de colisao
+    float pos[2];
+    float largura,altura;
+};
+
 // Criando um (estrutura) objeto de particula
 struct Particula{
     float pos[3];
@@ -309,6 +321,9 @@ struct Particula{
 
     // angulo de movimentacao
     float angulo_sentido;
+
+    // Adiciona um elemento para particulas que tem colisao a se avaliada
+    caixaColisao caixa;
 };
 
 // Criando uma estrutura para a fonte de particulas
@@ -362,15 +377,53 @@ struct posColisaoMapa{
 
 posColisaoMapa colisoesMapa[10];
 
-// Criando uma estrutura para colisoes de caixa (bounded box)
-struct caixaColisao{
-    // A posicao sera considerada como um quadrado de colisao
-    float pos[2];
-    float largura,altura;
+// Vetor de colisoes possiveis no mapa
+const int nCaixasColisoes = 35;
+
+caixaColisao colisaoMapa[nCaixasColisoes];
+
+struct objeto{
+ int idObj;
+ float posAngObj;
 };
 
-// Vetor de colisoes possiveis no mapa
-caixaColisao colisaoMapa[35];
+objeto objetosMortos[nCaixasColisoes];
+
+// Vetor que contem a lista de inimigos randomicos gerados
+const int nInimigosRodada = 5;
+int idInimigosEscolhidos[nInimigosRodada];
+
+void geraInimigosRodada(){
+    /*
+        A funcao geraInimigosRodada e utilizada para gerar numeros
+        randomicos de 0 a 31 e preencher um vetor de inimigos,
+        esses numeros gerados correspondem aos id's dos blocos inimigos
+    */
+    for(int i = 0; i <= nInimigosRodada; i++){
+        idInimigosEscolhidos[i] = (rand() % 31);
+
+        // Comparando para nao gerar inimigos repetidos
+        /*for(int j = 0; j <= i; j++){
+            // Repetiu Id de inimigo
+            if(idInimigosEscolhidos[j] == idInimigosEscolhidos[i]){
+                i = i - 1;
+                break;
+            }
+        }
+        */
+        printf("%d \n",idInimigosEscolhidos[i]);
+    }
+}
+
+bool checaColidiuComInimigo(int idCol){
+    for(int i = 0; i<= nInimigosRodada; i++){
+        // A colisao e com um inimigo
+        if(idInimigosEscolhidos[i] == idCol){
+            return true;
+        }
+    }
+    return false;
+}
 
 bool checaColisaoBox(struct caixaColisao colBox1, struct caixaColisao colBox2){
     /*
@@ -388,17 +441,37 @@ bool checaColisaoBox(struct caixaColisao colBox1, struct caixaColisao colBox2){
     }
 }
 
-void adicionaColisaoMapa(struct caixaColisao *caixa, float x, float y){
+void adicionaColisaoMapa(struct caixaColisao *caixa,int idObjColisao, float x, float y){
 /*
     A funcao adicionaColisaoMapa e utilizada para adicionar caixas
     de colisao dentro do mapa
     struct caixaColisao, float x, float y
 */
 
+    caixa->idObj = idObjColisao;
     caixa->altura = 1.0f;
     caixa->largura = 1.0f;
     caixa->pos[0] = x;
     caixa->pos[1] = y;
+}
+
+void removeColisaoMapa(int idObjColisao){
+/*
+    A funcao adicionaColisaoMapa e utilizada para adicionar caixas
+    de colisao dentro do mapa
+    struct caixaColisao, float x, float y
+*/
+
+    for(int i=0; i < nCaixasColisoes; i++){
+        // Retira a colisao desse objeto
+        if(colisaoMapa[i].idObj == idObjColisao){
+                colisaoMapa[i].altura = 0.0f;
+                colisaoMapa[i].largura = 0.0f;
+                colisaoMapa[i].pos[0] = 500.0f;
+                colisaoMapa[i].pos[1] = 500.0f;
+
+        }
+    }
 }
 // ########## Fim definicoes de colisao ####
 
@@ -413,28 +486,51 @@ Particula projetil[qtdTiros];
 
 void colisoesDoMapa(){
     // Definindo colisoes do mapa
-    adicionaColisaoMapa(&colisaoMapa[0], 0.0f, 16.0f);
-    adicionaColisaoMapa(&colisaoMapa[1], -3.0f, 16.0f);
-    adicionaColisaoMapa(&colisaoMapa[2], -6.0f, 14.0f);
-    adicionaColisaoMapa(&colisaoMapa[3], -9.0f, 13.0f);
+
+    adicionaColisaoMapa(&colisaoMapa[1],1, 16.0f, 3.0f);
+    adicionaColisaoMapa(&colisaoMapa[2],2, 15.0f, 7.0f);
+    adicionaColisaoMapa(&colisaoMapa[3],3, 13.0f, 9.0f);
+    adicionaColisaoMapa(&colisaoMapa[4],4, 12.0f, 11.0f);
+    adicionaColisaoMapa(&colisaoMapa[5],5, 9.0f, 14.0f);
+    adicionaColisaoMapa(&colisaoMapa[6],6, 6.0f, 15.0f);
+    adicionaColisaoMapa(&colisaoMapa[7],7, 3.0f, 16.0f);
+
+    adicionaColisaoMapa(&colisaoMapa[8],8, 0.0f, 16.0f);
+    adicionaColisaoMapa(&colisaoMapa[9],9, -3.0f, 16.0f);
+    adicionaColisaoMapa(&colisaoMapa[10],10, -6.0f, 14.0f);
+    adicionaColisaoMapa(&colisaoMapa[11],11, -9.0f, 13.0f);
 
 
-    adicionaColisaoMapa(&colisaoMapa[4], -11.0f, 11.0f);
-    adicionaColisaoMapa(&colisaoMapa[5], -13.0f, 9.0f);
-    adicionaColisaoMapa(&colisaoMapa[6], -15.0f, 6.0f);
-    adicionaColisaoMapa(&colisaoMapa[7], -16.0f, 3.0f);
-    adicionaColisaoMapa(&colisaoMapa[8], -16.0f, 0.0f);
-    adicionaColisaoMapa(&colisaoMapa[9], -16.0f, -3.0f);
-    adicionaColisaoMapa(&colisaoMapa[10], -15.0f, -6.0f);
+    adicionaColisaoMapa(&colisaoMapa[12],12, -11.0f, 11.0f);
+    adicionaColisaoMapa(&colisaoMapa[13],13, -13.0f, 9.0f);
+    adicionaColisaoMapa(&colisaoMapa[14],14, -15.0f, 6.0f);
+    adicionaColisaoMapa(&colisaoMapa[15],15, -16.0f, 3.0f);
+    adicionaColisaoMapa(&colisaoMapa[16],16, -16.0f, 0.0f);
+    adicionaColisaoMapa(&colisaoMapa[17],17, -16.0f, -3.0f);
+    adicionaColisaoMapa(&colisaoMapa[18],18, -15.0f, -6.0f);
 
-    adicionaColisaoMapa(&colisaoMapa[11], -14.0f, -9.0f);
-    adicionaColisaoMapa(&colisaoMapa[12], -12.0f, -12.0f);
-    adicionaColisaoMapa(&colisaoMapa[13], -9.0f, -14.0f);
-    adicionaColisaoMapa(&colisaoMapa[14], -6.0f, -14.0f);
+    adicionaColisaoMapa(&colisaoMapa[19],19, -14.0f, -9.0f);
+    adicionaColisaoMapa(&colisaoMapa[20],20, -12.0f, -12.0f);
+    adicionaColisaoMapa(&colisaoMapa[21],21, -9.0f, -14.0f);
+    adicionaColisaoMapa(&colisaoMapa[22],22, -6.0f, -14.0f);
+
+    adicionaColisaoMapa(&colisaoMapa[23],23, -3.0f, -15.0f);
+    adicionaColisaoMapa(&colisaoMapa[24],24, 0.0f, -16.0f);
+    adicionaColisaoMapa(&colisaoMapa[25],25, 3.0f, -15.0f);
+    adicionaColisaoMapa(&colisaoMapa[26],26, 6.0f, -15.0f);
+    adicionaColisaoMapa(&colisaoMapa[27],27, 9.0f, -14.0f);
+
+    adicionaColisaoMapa(&colisaoMapa[28],28, 12.0f, -12.0f);
+    adicionaColisaoMapa(&colisaoMapa[29],29, 14.0f, -9.0f);
+    adicionaColisaoMapa(&colisaoMapa[30],30, 16.0f, -6.0f);
+    adicionaColisaoMapa(&colisaoMapa[31],31, 16.0f, -3.0f);
+    adicionaColisaoMapa(&colisaoMapa[32],32, 17.0f, 0.0f);
+
+
 }
-// ######## Fim definições tiro ###########
+// ######## Fim definições tiro ###########+
 
-
+// Comparacao de colisao de objeto baseado em cordenada
 bool objetoColidiu(struct posColisaoMapa *colisoesMapa, float xObj, float yObj){
     int xObjInt = floor(xObj);
     int yObjInt = floor(yObj);
@@ -450,6 +546,24 @@ bool objetoColidiu(struct posColisaoMapa *colisoesMapa, float xObj, float yObj){
     return false;
 }
 
+// Comparacao de colisao de objeto baseada em caixa AABB
+int comparaTodasColisoes(struct caixaColisao comparaCaixa){
+    /*
+        A funcao comparaTodasColisoes verifica comparando todas as caixas
+        de colisao do mapa com a caixa passada como referencia, para ver
+        se houve colisao entre qualquer uma delas, retornando true
+        se ocorreu ou false se caso contrario
+    */
+    for(int i=0; i<nCaixasColisoes;i++){
+        // Caso ocorreu alguma colisao
+        if(checaColisaoBox(comparaCaixa,colisaoMapa[i])){
+            // Obtem o id do objeto em que ocorreu a colisao
+            printf("Id obj colisao %d", colisaoMapa[i].idObj);
+            return colisaoMapa[i].idObj;
+       }
+    }
+    return -1;
+}
 
 // ### Inicio definicoes de textura ###
 GLuint texture;
@@ -803,18 +917,37 @@ void eixos(float T)
     glEnd();
 };
 
+bool testeComparaMortos(float f){
+    /*
+    A funcao testeComparaMortos decide quais elementos do stone range nao
+    deverao mais ser desenhados pois estao mortos
+    */
+    for(int i =0; i< nCaixasColisoes; i++){
+        if(f == (objetosMortos[i].idObj) * (objetosMortos[i].posAngObj)){
+            return true;
+        }
+    }
+        return false;
+}
 void BaseCirculo(){
     float umin = 0;
     float umax = 360;
     float du = (umax-umin)/32;
       // float du = 4 * M_PI / 180;
     float i;
+    int v = 0;
     i = umin;
 
     // Definindo as dimensos do cubo
     //glScaled(1.0,2.0,4.0);
 
     while(i <= umax){
+        // Analisa se esse elemento esta morto e entao nao desenha mais
+       if( testeComparaMortos(i)){
+
+        }
+        else
+        {
             glPushMatrix();
                 glRotated(i,0,0,1);
                 glTranslated(16,0,2.0);
@@ -822,6 +955,7 @@ void BaseCirculo(){
 
                 desenhaCubo();
             glPopMatrix();
+        }
         i = i + du;
     }
 }
@@ -1103,15 +1237,16 @@ void UpdateFonteDeParticula(){
 // ### FIM DEFINICOES PARTICULAS ###
 
 // ### Inicio de definicoes de tela de introducao do jogo ###
-float tempoInstrucoes = 5.0f;
+//float tempoInstrucoes = 23.0f;
+ float tempoInstrucoes = 2.0f;
 
 // Funcao para escrever texto na tela
-void PrintTxtTela( int x, int y, char *st)
+void PrintTxtTela( int x, int y, char *st){
 /*
     A funcao PrintTxtTela recebe uma string e exibe
     na tela em alguma posicao especifica
 */
-{
+
 int l,i;
 glPushMatrix();
 glColor3f(1.0f,1.0f,1.0f);
@@ -1140,8 +1275,33 @@ void apresentaInstrucoes(){
 
 // ### Fim de definicoes de tela de introducao do jogo ###
 
+int GerenciamentoObjetosMortos(int idObjMorto){
+    /*
+    A funcao GerenciamentoObjetosMortos permite a inclusao
+    de novos objetos que morreram decorrente de colisoes e
+    fazendo assim parar de renderizalos
+
+    Retornos: 0 -> Tinha espaco no sistema
+    */
+    // Varre todo o vetor de sistema projeteis
+    for(int i = 0; i < nCaixasColisoes; i++){
+        //  Essa posicao ainda nao foi instanciada
+        if((objetosMortos[i].posAngObj) == 0.0f){
+            // Cria um objeto nesse inice
+            objetosMortos[i].idObj = idObjMorto;
+            objetosMortos[i].posAngObj = 11.25f;
+            return 0;
+        }
+    }
+}
 
 void atira(struct Particula *projetil, float balaPosIniX, float balaPosIniY, float balaPoslxDisp, float balaPoslyDisp){
+    /*
+        [Deprecada]
+        A funcao atira é responsavel por verificar se o jogador ainda possui municao
+        para realizar disparos e caso tenha instancia um projetil na mesma posicao do
+        mesmo com a rotacao correta
+    */
     // Nao tem mais balas entao nao atira
     if(qtdTirosRestantes <= 0){
 
@@ -1154,6 +1314,12 @@ void atira(struct Particula *projetil, float balaPosIniX, float balaPosIniY, flo
         projetil->pos[0] = balaPosIniX;
         // posicao y
         projetil->pos[1] = balaPosIniY;
+
+        // Definicoes de colisao do projetil
+        projetil->caixa.altura = 1.0f;
+        projetil->caixa.largura = 1.0f;
+        projetil->caixa.pos[0] = balaPosIniX;
+        projetil->caixa.pos[1] = balaPosIniY;
 
         // Instancia particulas na posicao do disparo
         GerenciamentoDeInstanciamentoFonteDeParticulas(balaPosIniX,balaPosIniY,0.0f,0.3f);
@@ -1172,6 +1338,11 @@ void atira(struct Particula *projetil, float balaPosIniX, float balaPosIniY, flo
 
 // Realiza as atualizações da posiçao do projetil
 void updateProjetil(struct Particula *projetil){
+    /*
+        A funcao updateProjetil e responsavel por pegar uma referencia de projetil
+        e ir atualizando sua posicao verificando sempre se ela colidiu
+    */
+
     // Manda o projetil para frente de acordo com sua posicao atual e angulo
     // obtem o sentido atraves do angulo
     float lx2 = sin(projetil->angulo_sentido);
@@ -1181,6 +1352,21 @@ void updateProjetil(struct Particula *projetil){
     projetil->pos[0] = projetil->pos[0] + lx2;
     projetil->pos[1] = projetil->pos[1] + lz2;
 
+    // Vai atualizando a posicao da caixa de colisao do projetil
+    projetil->caixa.pos[0] = projetil->pos[0];
+    projetil->caixa.pos[1] = projetil->pos[1];
+
+    int resultColisao = comparaTodasColisoes(projetil->caixa);
+    // Verifica se colidiu antes de desenhar a proxima
+    if(resultColisao != -1){
+        GerenciamentoDeInstanciamentoFonteDeParticulas(projetil->caixa.pos[0],projetil->caixa.pos[1],0.0f,0.3f);
+        // Mata a caixa atingida
+        GerenciamentoObjetosMortos(resultColisao);
+        projetil->tempoDeVida = 0.0f;
+        // Remove a caixa de colisao daquele objeto
+        removeColisaoMapa(resultColisao);
+    }
+
     // Instancia o projetil
     glPushMatrix();
     glTranslatef(projetil->pos[0],projetil->pos[1],0.0);
@@ -1188,6 +1374,100 @@ void updateProjetil(struct Particula *projetil){
     glPopMatrix();
 }
 
+int GerenciamentoDeInstanciamentoProjetil(float xProj, float yProj, float zProj,float tempoDeVidaProj){
+    /*
+    A funcao GerenciamentoDeInstanciamentoProjetil permite
+    atualiza a struct de particulas existentes
+     atraves da definicao da posicao do sistema e do tempo de vida,
+    alocando no vetor de sistema ja existente na melhor posicao, ou substituindo caso
+    ja tenha ultrapassado seu limite.
+
+    Retornos: 0 -> Tinha espaco no sistema
+              1 -> Sistema lotado e algum sistema substituido
+    */
+
+    // Guarda o indice do sistema
+    int indexProjeteis = 0;
+    float tempoVidaProjetil = 100.0f;
+
+    // Varre todo o vetor de sistema projeteis
+    for(int i = 0; i < qtdTiros; i++){
+
+        // Analisa se o a posicao de projetil ja esta "morto"
+        // Sistema esta morto
+        if((projetil[i].tempoDeVida) == 0.0f){
+            // Cria um sistema nesse indice
+            projetil[i].pos[0] = xProj;
+            projetil[i].pos[1] = yProj;
+            projetil[i].pos[2] = zProj;
+
+            // Definicoes de colisao do projetil
+            projetil[i].caixa.altura = 1.0f;
+            projetil[i].caixa.largura = 1.0f;
+            projetil[i].caixa.pos[0] = xProj;
+            projetil[i].caixa.pos[1] = yProj;
+
+            // Armazena trajetoria
+            projetil[i].angulo_sentido = angle;
+            projetil[i].tempoDeVida = tempoDeVidaProj;
+
+        // Instancia particulas na posicao do disparo
+        GerenciamentoDeInstanciamentoFonteDeParticulas(xProj,yProj,0.0f,0.3f);
+
+            return 0;
+        }
+        // Sistema ainda esta vivo
+        else{
+            if(tempoVidaProjetil > projetil[i].tempoDeVida){
+                // Guarda o indice desse sistema e seu tempo de vida para ver se sera substituido
+                indexProjeteis = i;
+                tempoVidaProjetil = projetil[i].tempoDeVida;
+            }
+        }
+    }
+    // O vetor de projeteis esta lotado se saiu do for
+    // Cria um projetil no indice de sistema q tem o menor tempo de vida
+            projetil[indexProjeteis].pos[0] = xProj;
+            projetil[indexProjeteis].pos[1] = yProj;
+            projetil[indexProjeteis].pos[2] = zProj;
+            projetil[indexProjeteis].angulo_sentido = angle;
+            projetil[indexProjeteis].tempoDeVida = tempoDeVidaProj;
+
+            // Definicoes de colisao do projetil
+            projetil[indexProjeteis].caixa.altura = 1.0f;
+            projetil[indexProjeteis].caixa.largura = 1.0f;
+            projetil[indexProjeteis].caixa.pos[0] = xProj;
+            projetil[indexProjeteis].caixa.pos[1] = yProj;
+
+            // Instancia particulas na posicao do disparo
+            GerenciamentoDeInstanciamentoFonteDeParticulas(xProj,yProj,0.0f,0.3f);
+        return 1;
+}
+
+
+void ControlaProjeteis(){
+    /*
+        ControlaProjeteis e uma funcao que tem por objetivo
+        varrer todo o vetor de projeteis disponiveis, caso tenha
+        projeteis ativos, reduz seu respectivo tempo de vida e desenha
+        naquele frame e caso esteja morto, para de desenhar e arredonda
+        seu valor para 0.0
+    */
+    // Varre todo o vetor de sistema de projeteis
+    for(int i = 0; i < qtdTiros; i++){
+        if(projetil[i].tempoDeVida > 0.0f){
+
+            // Decrementa o tempo de vida do sistema de emissao de particula pelo tempo do ultimo update de frame
+            projetil[i].tempoDeVida = projetil[i].tempoDeVida - tempo_gasto;
+
+            // Desenha a fonte para aquele frame
+            updateProjetil(&projetil[i]);
+        }
+        else{
+            projetil[i].tempoDeVida = 0.0f;
+        }
+    }
+}
 /* GLUT callback Handlers */
 
 static void resize(int width, int height)
@@ -1221,14 +1501,28 @@ static void display(void)
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
-
     // Exibe instrucoes so por um determinado tempo
     if(tempoInstrucoes > 0.0){
-        // Exibe as instrucoes de entrada
-        PrintTxtTela((20*(0.5*ScreenWidth)/ScreenWidth)-13,-5,"Instrucoes basicas:");
-        PrintTxtTela((20*(0.5*ScreenWidth)/ScreenWidth)-18,-7,"Para se movimentar use as teclas (W,A,S,D)");
-        PrintTxtTela((20*(0.5*ScreenWidth)/ScreenWidth)-18,-8,"Para atirar utilize a tecla (K)");
-        PrintTxtTela((20*(0.5*ScreenWidth)/ScreenWidth)-12,-10,"Aguarde...");
+        if(tempoInstrucoes > 14.0){
+            PrintTxtTela((20*(0.5*ScreenWidth)/ScreenWidth)-18,-5,"Numa cidade muito distante chamada Propolis,");
+            PrintTxtTela((20*(0.5*ScreenWidth)/ScreenWidth)-20,-7,"Muitos inimigos se disfarcaram em estruturas classicas,");
+            PrintTxtTela((20*(0.5*ScreenWidth)/ScreenWidth)-20,-8,"aterrorizando vizinhancas nas noites escuras sem deixar rastros.");
+        }
+        else if(tempoInstrucoes > 5.0){
+            PrintTxtTela((20*(0.5*ScreenWidth)/ScreenWidth)-20,-5,"Com avanco da tecnologia foi possivel revelar seus disfarces,");
+            PrintTxtTela((20*(0.5*ScreenWidth)/ScreenWidth)-20,-6,"com isso, guerreiros se mobilizaram contra esse mal.");
+            PrintTxtTela((20*(0.5*ScreenWidth)/ScreenWidth)-20,-9,"Mas cuidado!, entre os maus existem estruturas boas tambem!");
+            PrintTxtTela((20*(0.5*ScreenWidth)/ScreenWidth)-20,-11,"Ao derrotalas voce perderá vida decorrente de tal erro. ");
+        }
+        else{
+            // Exibe as instrucoes de entrada
+            PrintTxtTela((20*(0.5*ScreenWidth)/ScreenWidth)-13,-5,"Instrucoes basicas:");
+            PrintTxtTela((20*(0.5*ScreenWidth)/ScreenWidth)-18,-7,"Para se movimentar use as teclas (W,A,S,D)");
+            PrintTxtTela((20*(0.5*ScreenWidth)/ScreenWidth)-18,-8,"Para atirar utilize a tecla (K)");
+            PrintTxtTela((20*(0.5*ScreenWidth)/ScreenWidth)-18,-9,"Para ativar o detector de estruturas do mal(Y)");
+       //     PrintTxtTela((20*(0.5*ScreenWidth)/ScreenWidth)-12,-10,"Aguarde...");
+        }
+
 
         // Carrega um fundo preto
         apresentaInstrucoes();
@@ -1241,8 +1535,11 @@ static void display(void)
     // Exibe no canto da tela o valor
     PrintTxtTela((20*(0.5*ScreenWidth)/ScreenWidth)-20,-9,strBuf);
 
-    // Adicionando as caixas de colisoes do mapa
-    colisoesDoMapa();
+    if(carregadasColisoesMapa == 0){
+        // Adicionando as caixas de colisoes do mapa
+        colisoesDoMapa();
+        carregadasColisoesMapa = 1;
+    }
 
     // Cria personagem e sua caixa de colisao
     criaPersonagem();
@@ -1255,7 +1552,10 @@ static void display(void)
     teste1.pos[1] = 16.0f;
 
 
-    if(checaColisaoBox(personagem,teste1)){
+geraInimigosRodada();
+
+    //if(checaColisaoBox(personagem,teste1)){
+    if(comparaTodasColisoes(personagem) != -1){
         printf("Colidiu");
     }
     else{
@@ -1272,16 +1572,8 @@ static void display(void)
     // Ativa sistema que fica desenhando as particulas
     UpdateFonteDeParticula();
 
-    if(atirou == true){
-        atira(&projetil[1],balaPosIniX,balaPosIniY,balaPoslxDisp, balaPoslyDisp);
-    }
-
-    updateProjetil(&projetil[1]);
-
-
-  //  eixos(10.0);
-
-
+    // Sistema de controle de projeteis disparados
+    ControlaProjeteis();
 
     //termina de rodar o mundo
     glPopMatrix();
@@ -1314,6 +1606,7 @@ static void key(unsigned char key, int xx, int yy)
 
                     atirou = true;
                     if(qtdTirosRestantes > 0){
+                        GerenciamentoDeInstanciamentoProjetil(x,z,0,1);
                         qtdTirosRestantes = qtdTirosRestantes - 1;
                     }
 
@@ -1336,7 +1629,8 @@ static void key(unsigned char key, int xx, int yy)
 			x += lx ;
 			z += lz ;
 
-			if(objetoColidiu(&colisoesMapa[2], x, z)){
+			//if(objetoColidiu(&colisoesMapa[2], x, z)){
+			if(comparaTodasColisoes(personagem) != -1){
                 x -= lx ;
                 z -= lz ;
 			}
@@ -1345,6 +1639,11 @@ static void key(unsigned char key, int xx, int yy)
 		case 's' :
 			x -= lx;
 			z -= lz;
+
+      //      if(comparaTodasColisoes(personagem)){
+      //          x += lx;
+      //          z += lz;
+       //     }
 			break;
 
         case 'p':
@@ -1445,3 +1744,4 @@ int main(int argc, char *argv[])
 
     return EXIT_SUCCESS;
 }
+
