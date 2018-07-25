@@ -38,6 +38,9 @@ int ptosVida = 5;
 // Variavel que guarda os pontos somados pelos usuario
 int ptosAcertos = 0;
 
+// Variavel que bloqueia os movimentos do personagem (Principalmente ao acabar o jogo)
+int jogoTravado = 0;
+
 // Obtem a largura e altura da janela
 int ScreenWidth;
 int screenHeight;
@@ -942,6 +945,17 @@ bool testeComparaMortos(float f){
     }
         return false;
 }
+
+void limpaMortos(){
+    /*
+    A funcao limpaMortos retira todos os objetos mortos
+    para a reinicializacao do jogo
+    */
+    for(int i =0; i< nCaixasColisoes; i++){
+        objetosMortos[i].idObj = 0;
+        }
+}
+
 void BaseCirculo(){
     float umin = 0;
     float umax = 360;
@@ -1250,8 +1264,8 @@ void UpdateFonteDeParticula(){
 // ### FIM DEFINICOES PARTICULAS ###
 
 // ### Inicio de definicoes de tela de introducao do jogo ###
-//float tempoInstrucoes = 23.0f;
- float tempoInstrucoes = 2.0f;
+float tempoInstrucoes = 23.0f;
+// float tempoInstrucoes = 2.0f;
 
 // Funcao para escrever texto na tela
 void PrintTxtTela( int x, int y, char *st){
@@ -1273,6 +1287,26 @@ glRasterPos2i( x, y); // location to start printing text
 glPopMatrix();
 }
 
+// Funcao para escrever texto na tela
+void PrintTxtTelaGameOver( int x, int y, char *st){
+/*
+    A funcao PrintTxtTela recebe uma string e exibe
+    na tela em alguma posicao especifica
+*/
+
+int l,i;
+glPushMatrix();
+glColor3f(1.0f,0.0f,0.0f);
+glTranslatef(0.0f,7.0f,25.0f);
+l=strlen( st ); // see how many characters are in text string.
+glRasterPos2i( x, y); // location to start printing text
+    for( i=0; i < l; i++) // loop until i is greater then l
+    {
+    glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, st[i]); // Print a character on the screen
+    }
+glPopMatrix();
+}
+
 void apresentaInstrucoes(){
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glColor4f(0.0f,0.0f,0.0f,1-tempoInstrucoes);
@@ -1282,9 +1316,28 @@ void apresentaInstrucoes(){
         glPopMatrix();
         tempoInstrucoes = tempoInstrucoes - tempo_gasto;
         printf("%f", tempoInstrucoes);
-
-
 }
+
+void encerramentoGameOver(){
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+        glPushMatrix();
+        glColor4f(0.0f,0.0f,0.0f,0.8f);
+        glScalef(20.0f,20.0f,50.0f);
+        desenhaPlanoIntro();
+        glPopMatrix();
+}
+
+void encerramentoWinner(){
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+        glPushMatrix();
+        glColor4f(0.0f,1.0f,0.0f,0.8f);
+        glScalef(20.0f,20.0f,50.0f);
+        desenhaPlanoIntro();
+        glPopMatrix();
+}
+
 
 // ### Fim de definicoes de tela de introducao do jogo ###
 
@@ -1527,6 +1580,32 @@ static void display(void)
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
+    // Caso o personagem morreu
+    if(ptosVida == 0){
+        PrintTxtTelaGameOver((20*(0.5*ScreenWidth)/ScreenWidth)-14,-4,"GAME OVER");
+        PrintTxtTelaGameOver((20*(0.5*ScreenWidth)/ScreenWidth)-18,-6,"Seus erros consumiram todas as suas vidas,");
+        PrintTxtTelaGameOver((20*(0.5*ScreenWidth)/ScreenWidth)-18,-7,"alem de sacrificar muitas estruturas boas");
+
+        PrintTxtTelaGameOver((20*(0.5*ScreenWidth)/ScreenWidth)-18,-9,"Pressione a tecla R para jogar novamente");
+        encerramentoGameOver();
+
+        // Trava os movimentos do jogo
+        jogoTravado = 1;
+
+    }
+    // Caso ele ganhou a partida
+    else if(ptosAcertos == 5){
+        PrintTxtTelaGameOver((20*(0.5*ScreenWidth)/ScreenWidth)-14,-4,"A CIDADE ESTA A SALVO");
+        PrintTxtTelaGameOver((20*(0.5*ScreenWidth)/ScreenWidth)-18,-6,"Parabens sua determinacao conseguiu salvar a cidade,");
+        PrintTxtTelaGameOver((20*(0.5*ScreenWidth)/ScreenWidth)-18,-7,"das estruturas das trevas.");
+
+        PrintTxtTelaGameOver((20*(0.5*ScreenWidth)/ScreenWidth)-18,-9,"Pressione a tecla R para jogar novamente");
+        encerramentoWinner();
+
+        // Trava os movimentos do jogo
+        jogoTravado = 1;
+    }
+
     // Exibe instrucoes so por um determinado tempo
     if(tempoInstrucoes > 0.0){
         if(tempoInstrucoes > 14.0){
@@ -1534,7 +1613,7 @@ static void display(void)
             PrintTxtTela((20*(0.5*ScreenWidth)/ScreenWidth)-20,-7,"Muitos inimigos se disfarcaram em estruturas classicas,");
             PrintTxtTela((20*(0.5*ScreenWidth)/ScreenWidth)-20,-8,"aterrorizando vizinhancas nas noites escuras sem deixar rastros.");
         }
-        else if(tempoInstrucoes > 5.0){
+        else if(tempoInstrucoes > 7.0){
             PrintTxtTela((20*(0.5*ScreenWidth)/ScreenWidth)-20,-5,"Com avanco da tecnologia foi possivel revelar seus disfarces,");
             PrintTxtTela((20*(0.5*ScreenWidth)/ScreenWidth)-20,-6,"com isso, guerreiros se mobilizaram contra esse mal.");
             PrintTxtTela((20*(0.5*ScreenWidth)/ScreenWidth)-20,-9,"Mas cuidado!, entre os maus existem estruturas boas tambem!");
@@ -1543,9 +1622,11 @@ static void display(void)
         else{
             // Exibe as instrucoes de entrada
             PrintTxtTela((20*(0.5*ScreenWidth)/ScreenWidth)-13,-5,"Instrucoes basicas:");
-            PrintTxtTela((20*(0.5*ScreenWidth)/ScreenWidth)-18,-7,"Para se movimentar use as teclas (W,A,S,D)");
-            PrintTxtTela((20*(0.5*ScreenWidth)/ScreenWidth)-18,-8,"Para atirar utilize a tecla (K)");
-            PrintTxtTela((20*(0.5*ScreenWidth)/ScreenWidth)-18,-9,"Para ativar o detector de estruturas do mal(Y)");
+            PrintTxtTela((20*(0.5*ScreenWidth)/ScreenWidth)-18,-7,"Para se movimentar use as teclas (w,a,s,d)");
+            PrintTxtTela((20*(0.5*ScreenWidth)/ScreenWidth)-18,-8,"Para atirar utilize a tecla (k)");
+            PrintTxtTela((20*(0.5*ScreenWidth)/ScreenWidth)-18,-9,"Para ativar o detector de estruturas do mal, tecla(y)");
+            PrintTxtTela((20*(0.5*ScreenWidth)/ScreenWidth)-18,-11,"Para recomecar o desafio use a tecla (e)");
+            PrintTxtTela((20*(0.5*ScreenWidth)/ScreenWidth)-18,-12,"OBS: Cuidado para nao ativar o Caps Lock !");
        //     PrintTxtTela((20*(0.5*ScreenWidth)/ScreenWidth)-12,-10,"Aguarde...");
         }
 
@@ -1589,24 +1670,21 @@ static void display(void)
     criaPersonagem();
 
         // Teste de bondbox de colisao
-    caixaColisao teste1;
-    teste1.altura = 1.0f;
-    teste1.largura = 1.0f;
-    teste1.pos[0] = 0.0f;
-    teste1.pos[1] = 16.0f;
-
-
-
+   // caixaColisao teste1;
+    //teste1.altura = 1.0f;
+    //teste1.largura = 1.0f;
+    //teste1.pos[0] = 0.0f;
+    //teste1.pos[1] = 16.0f;
 
     //if(checaColisaoBox(personagem,teste1)){
-    if(comparaTodasColisoes(personagem) != -1){
-        printf("Colidiu");
-    }
-    else{
-        printf("Nao Colidiu");
-    }
+  //  if(comparaTodasColisoes(personagem) != -1){
+    //    printf("Colidiu");
+   // }
+    //else{
+    //    printf("Nao Colidiu");
+   // }
 
-	gluLookAt(	x, z, 0.4f,x+lx, z+lz,0.0f,0.0f, 0.0f,1.0f);
+    gluLookAt(	x, z, 0.4f,x+lx, z+lz,0.0f,0.0f, 0.0f,1.0f);
         glPushMatrix();
         printf("Posicao x: %f y: %f \n", x, z);
       //  RenderizarTextura(0.0f, 3.0f);
@@ -1638,72 +1716,126 @@ static void key(unsigned char key, int xx, int yy)
     switch (key)
     {
         case 27 :
+            // Trava todas as teclas do jogo
+            if(jogoTravado == 1){
+                // Reseta o jogo
+                case 'r' :
+                    // Retira todos objetos mortos do vetor
+                    limpaMortos();
+                    // Reinicia as instruções
+                    tempoInstrucoes = 23.0f;
+                    // Recarrega todas as colisoes do mapa
+                    carregadasColisoesMapa = 0;
+                    // Reinicia o tempo de vida
+                    ptosVida = 5;
+                    // Reinicia os pontos acertados
+                    ptosAcertos = 0;
+                    // Reincia a quantidade de tiros
+                    qtdTirosRestantes = qtdTiros;
+                    // Reincia a posicao do jogador
+                    // Posicao
+                    x = 0.0f;
+                    z = 2.0f;
+                    // Angulo
+                    angle = 0.0f;
+                    // Direcao da camera
+                    lx = 0.0f;
+                    lz = -1.0f;
+                break;
+            }
+            else{
 
-            case 'k' :
-                // Permite atirar se tiver municao
-            //    if(qtdTiros > 0){
-                    // Definindo que o lugar que atirou é o lugar de nascimento da bala
-                    balaPosIniX = x;
-                    balaPosIniY = z;
-                    balaPoslxDisp = lx;
-                    balaPoslyDisp = lz;
 
-                    atirou = true;
-                    if(qtdTirosRestantes > 0){
-                        GerenciamentoDeInstanciamentoProjetil(x,z,0,1);
-                        qtdTirosRestantes = qtdTirosRestantes - 1;
-                    }
+                case 'k' :
+                    // Permite atirar se tiver municao
+                //    if(qtdTiros > 0){
+                        // Definindo que o lugar que atirou é o lugar de nascimento da bala
+                        balaPosIniX = x;
+                        balaPosIniY = z;
+                        balaPoslxDisp = lx;
+                        balaPoslyDisp = lz;
 
-              //      qtdTiros = qtdTiros - 1;
-//                }
+                        atirou = true;
+                        if(qtdTirosRestantes > 0){
+                            GerenciamentoDeInstanciamentoProjetil(x,z,0,1);
+                            qtdTirosRestantes = qtdTirosRestantes - 1;
+                        }
 
-        break;
-
-		case 'd' :
-			angle -= 0.01f;
-			lx = sin(angle);
-			lz = -cos(angle);
-			break;
-		case 'a' :
-			angle += 0.01f;
-			lx = sin(angle);
-			lz = -cos(angle);
-			break;
-		case 'w' :
-			x += lx ;
-			z += lz ;
-
-			//if(objetoColidiu(&colisoesMapa[2], x, z)){
-			if(comparaTodasColisoes(personagem) != -1){
-                x -= lx ;
-                z -= lz ;
-			}
-
-			break;
-		case 's' :
-			x -= lx;
-			z -= lz;
-
-      //      if(comparaTodasColisoes(personagem)){
-      //          x += lx;
-      //          z += lz;
-       //     }
-			break;
-
-        case 'p':
-            exit(0);
-            break;
-
-        case '+':
-            break;
-
-        case 'x':
+                  //      qtdTiros = qtdTiros - 1;
+    //                }
 
             break;
 
-        case '-':
+                case 'e' :
+                    // Retira todos objetos mortos do vetor
+                    limpaMortos();
+                    // Reinicia as instruções
+                    tempoInstrucoes = 23.0f;
+                    // Recarrega todas as colisoes do mapa
+                    carregadasColisoesMapa = 0;
+                    // Reinicia o tempo de vida
+                    ptosVida = 5;
+                    // Reinicia os pontos acertados
+                    ptosAcertos = 0;
+                    // Reincia a quantidade de tiros
+                    qtdTirosRestantes = qtdTiros;
+                    // Reincia a posicao do jogador
+                    // Posicao
+                    x = 0.0f;
+                    z = 2.0f;
+                    // Angulo
+                    angle = 0.0f;
+                    // Direcao da camera
+                    lx = 0.0f;
+                    lz = -1.0f;
+                break;
 
-            break;
+            case 'd' :
+                angle -= 0.01f;
+                lx = sin(angle);
+                lz = -cos(angle);
+                break;
+            case 'a' :
+                angle += 0.01f;
+                lx = sin(angle);
+                lz = -cos(angle);
+                break;
+            case 'w' :
+                x += lx ;
+                z += lz ;
+
+                //if(objetoColidiu(&colisoesMapa[2], x, z)){
+                if(comparaTodasColisoes(personagem) != -1){
+                    x -= lx ;
+                    z -= lz ;
+                }
+
+                break;
+            case 's' :
+                x -= lx;
+                z -= lz;
+
+          //      if(comparaTodasColisoes(personagem)){
+          //          x += lx;
+          //          z += lz;
+           //     }
+                break;
+
+            case 'p':
+                exit(0);
+                break;
+
+            case '+':
+                break;
+
+            case 'x':
+
+                break;
+
+            case '-':
+
+                break;
+        }
     }
 
     glutPostRedisplay();
