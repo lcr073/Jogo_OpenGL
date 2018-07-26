@@ -414,7 +414,7 @@ struct posColisaoMapa{
 posColisaoMapa colisoesMapa[10];
 
 // Vetor de colisoes possiveis no mapa
-const int nCaixasColisoes = 35;
+const int nCaixasColisoes = 32;
 
 caixaColisao colisaoMapa[nCaixasColisoes];
 
@@ -1705,7 +1705,8 @@ static void display(void)
         PrintTxtTelaGameOver((20*(0.5*ScreenWidth)/ScreenWidth)-18,-7,"alem de sacrificar muitas estruturas boas !");
 
         PrintTxtTelaGameOver((20*(0.5*ScreenWidth)/ScreenWidth)-18,-9,"Pressione a tecla (r) para jogar novamente.");
-        PrintTxtTelaGameOver((20*(0.5*ScreenWidth)/ScreenWidth)-18,-11,"Obs: Cuidado para nao ativar o Caps Lock !");
+        PrintTxtTelaGameOver((20*(0.5*ScreenWidth)/ScreenWidth)-18,-11,"Pressione a tecla (q) para sair do jogo.");
+        PrintTxtTelaGameOver((20*(0.5*ScreenWidth)/ScreenWidth)-18,-13,"Obs: Cuidado para nao ativar o Caps Lock !");
         encerramentoGameOver();
 
         // Trava os movimentos do jogo
@@ -1719,7 +1720,8 @@ static void display(void)
         PrintTxtTelaGameOver((20*(0.5*ScreenWidth)/ScreenWidth)-18,-7,"das estruturas das trevas.");
 
         PrintTxtTelaGameOver((20*(0.5*ScreenWidth)/ScreenWidth)-18,-9,"Pressione a tecla (r) para jogar novamente.");
-        PrintTxtTelaGameOver((20*(0.5*ScreenWidth)/ScreenWidth)-18,-11,"Obs: Cuidado para nao ativar o Caps Lock !");
+        PrintTxtTelaGameOver((20*(0.5*ScreenWidth)/ScreenWidth)-18,-11,"Pressione a tecla (q) para sair do jogo.");
+        PrintTxtTelaGameOver((20*(0.5*ScreenWidth)/ScreenWidth)-18,-13,"Obs: Cuidado para nao ativar o Caps Lock !");
         encerramentoWinner();
 
         // Trava os movimentos do jogo
@@ -1732,12 +1734,16 @@ static void display(void)
             PrintTxtTela((20*(0.5*ScreenWidth)/ScreenWidth)-18,-5,"Numa cidade muito distante chamada Propolis,");
             PrintTxtTela((20*(0.5*ScreenWidth)/ScreenWidth)-20,-7,"Muitos inimigos se disfarcaram em estruturas classicas,");
             PrintTxtTela((20*(0.5*ScreenWidth)/ScreenWidth)-20,-8,"aterrorizando vizinhancas nas noites escuras sem deixar rastros.");
+            PrintTxtTelaGameOver((20*(0.5*ScreenWidth)/ScreenWidth)-18,-15,"Pressione a tecla (p) para pular a historia.");
+            PrintTxtTelaGameOver((20*(0.5*ScreenWidth)/ScreenWidth)-18,-16,"Pressione a tecla (q) para sair do jogo.");
         }
         else if(tempoInstrucoes > 7.0){
             PrintTxtTela((20*(0.5*ScreenWidth)/ScreenWidth)-20,-5,"Com avanco da tecnologia foi possivel revelar seus disfarces,");
             PrintTxtTela((20*(0.5*ScreenWidth)/ScreenWidth)-20,-6,"com isso, guerreiros se mobilizaram contra esse mal.");
             PrintTxtTela((20*(0.5*ScreenWidth)/ScreenWidth)-20,-9,"Mas cuidado!, entre os maus existem estruturas boas tambem!");
             PrintTxtTela((20*(0.5*ScreenWidth)/ScreenWidth)-20,-11,"Ao derrotalas voce perderá vida decorrente de tal erro. ");
+            PrintTxtTelaGameOver((20*(0.5*ScreenWidth)/ScreenWidth)-18,-15,"Pressione a tecla (p) para pular a historia.");
+            PrintTxtTelaGameOver((20*(0.5*ScreenWidth)/ScreenWidth)-18,-16,"Pressione a tecla (q) para sair do jogo.");
         }
         else{
             // Exibe as instrucoes de entrada
@@ -1747,6 +1753,8 @@ static void display(void)
             PrintTxtTela((20*(0.5*ScreenWidth)/ScreenWidth)-18,-9,"Para ativar o detector de estruturas do mal, tecla(y)");
             PrintTxtTela((20*(0.5*ScreenWidth)/ScreenWidth)-18,-11,"Para recomecar o desafio use a tecla (e)");
             PrintTxtTela((20*(0.5*ScreenWidth)/ScreenWidth)-18,-13,"OBS: Cuidado para nao ativar o Caps Lock !");
+        PrintTxtTelaGameOver((20*(0.5*ScreenWidth)/ScreenWidth)-18,-15,"Pressione a tecla (p) para pular a historia.");
+        PrintTxtTelaGameOver((20*(0.5*ScreenWidth)/ScreenWidth)-18,-16,"Pressione a tecla (q) para sair do jogo.");
        //     PrintTxtTela((20*(0.5*ScreenWidth)/ScreenWidth)-12,-10,"Aguarde...");
         }
 
@@ -1968,6 +1976,11 @@ static void key(unsigned char key, int xx, int yy)
                 break;
 
             case 'p':
+               // exit(0);
+               tempoInstrucoes = 0.0f;
+                break;
+
+            case 'q':
                 exit(0);
                 break;
 
@@ -2046,18 +2059,18 @@ int main(int argc, char *argv[])
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
 
-            // Ponto de iluminação
-            float d[4];
-            // posição da fonte pontual
-            d[0] = x;
-            d[1] = 0.0f;
-            d[2] = z;
-            d[3] = 1.0; // um ponto
+    // Ponto de iluminação
+    //float d[4];
+    // posição da fonte pontual
+    //d[0] = x;
+    //d[1] = 0.0f;
+    //d[2] = z;
+    //d[3] = 1.0; // um ponto
 
 
 
-      //      Configura_Fonte_Refletora(d,angle);
-            glEnable(GL_COLOR_MATERIAL);
+//      Configura_Fonte_Refletora(d,angle);
+   // glEnable(GL_COLOR_MATERIAL);
 
  // Liga as luzes
 
