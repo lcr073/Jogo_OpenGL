@@ -1730,7 +1730,11 @@ static void display(void)
 
     // Exibe instrucoes so por um determinado tempo
     if(tempoInstrucoes > 0.0){
-        if(tempoInstrucoes > 14.0){
+        if(tempoInstrucoes > 20.0){
+            PrintTxtTela((20*(0.5*ScreenWidth)/ScreenWidth)-17,-7,"THE STONE RANGERS SIMULATOR");
+            PrintTxtTela((20*(0.5*ScreenWidth)/ScreenWidth)-13,-10,"FPS Edition");
+        }
+        else if(tempoInstrucoes > 14.0){
             PrintTxtTela((20*(0.5*ScreenWidth)/ScreenWidth)-18,-5,"Numa cidade muito distante chamada Propolis,");
             PrintTxtTela((20*(0.5*ScreenWidth)/ScreenWidth)-20,-7,"Muitos inimigos se disfarcaram em estruturas classicas,");
             PrintTxtTela((20*(0.5*ScreenWidth)/ScreenWidth)-20,-8,"aterrorizando vizinhancas nas noites escuras sem deixar rastros.");
@@ -1955,24 +1959,34 @@ static void key(unsigned char key, int xx, int yy)
                 lz = -cos(angle);
                 break;
             case 'w' :
+                //if(objetoColidiu(&colisoesMapa[2], x, z)){
+                if(comparaTodasColisoes(personagem) != -1){
+                    x -= 3.0f*lx ;
+                    z -= 3.0f*lz ;
+                }
                 x += lx ;
                 z += lz ;
 
                 //if(objetoColidiu(&colisoesMapa[2], x, z)){
                 if(comparaTodasColisoes(personagem) != -1){
-                    x -= lx ;
-                    z -= lz ;
+                    x -= 3.0f*lx ;
+                    z -= 3.0f*lz ;
                 }
 
                 break;
             case 's' :
+                if(comparaTodasColisoes(personagem) != -1){
+                    x += 3.0f*lx;
+                    z += 3.0f*lz;
+                }
+
                 x -= lx;
                 z -= lz;
 
-          //      if(comparaTodasColisoes(personagem)){
-          //          x += lx;
-          //          z += lz;
-           //     }
+                if(comparaTodasColisoes(personagem) != -1){
+                    x += 3.0f*lx;
+                    z += 3.0f*lz;
+                }
                 break;
 
             case 'p':
