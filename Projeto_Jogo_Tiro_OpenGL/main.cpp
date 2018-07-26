@@ -611,7 +611,7 @@ int comparaTodasColisoes(struct caixaColisao comparaCaixa){
         se houve colisao entre qualquer uma delas, retornando true
         se ocorreu ou false se caso contrario
     */
-    for(int i=0; i<nCaixasColisoes;i++){
+    for(int i=0; i<=nCaixasColisoes;i++){
         // Caso ocorreu alguma colisao
         if(checaColisaoBox(comparaCaixa,colisaoMapa[i])){
             // Obtem o id do objeto em que ocorreu a colisao
@@ -876,11 +876,13 @@ void chao(){
 }
 
 void desenhaPlanoIntro(){
+    // Funcao utilizada para desenhar o plano na introducao e encerramentos
                 glRotated(-90,0,1,0);
                 face();
 }
 
 void desenhaCuboPers(){
+    // Funcao utilizada para desenhar os personagens em vermelho durante o flash
                 face();
 
             glPushMatrix();
