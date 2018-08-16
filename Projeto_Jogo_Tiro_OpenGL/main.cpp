@@ -645,29 +645,23 @@ void freeTexture()
     mTextureHeight = 0;
 }
 
-// Limpando tendo o id da textura
-void FreeTexture( GLuint texture )
-{
-  glDeleteTextures( 1, &texture );  //Delete our texture, simple enough.
-}
-
 // Realiza os pedidos para o openGL de gerar um ID e vincula uma fonte de pixeis de dados nesse ID
 bool loadTextureFromPixels32( GLuint* pixels, GLuint width, GLuint height )
 {
-    //Free texture if it exists
+    //Funcao que limpa as texturas existentes
     freeTexture();
 
-    //Get texture dimensions
+    //Obtem as dimensoes da textura
     mTextureWidth = width;
     mTextureHeight = height;
 
-    //Generate texture ID
+    //Pede ao OpenGL a geracao de um ID para vincular a textura
     glGenTextures( 1, &mTextureID );
 
-    //Bind texture ID
+    //Vincula a textura com o ID pedido
     glBindTexture( GL_TEXTURE_2D, mTextureID );
 
-    //Generate texture
+    //Gera a textura
 //    glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels );
 
     glTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_FLOAT, textGrama );
@@ -680,14 +674,14 @@ bool loadTextureFromPixels32( GLuint* pixels, GLuint width, GLuint height )
 
 glTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, 2,2 , 0, GL_RGB, GL_FLOAT, pixels2 );
 */
-    //Set texture parameters
+    //Definindo os parametros da textura
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
 
-    //Unbind texture
+    //Desvincula a textura para limpar espaço
     glBindTexture( GL_TEXTURE_2D, NULL );
 
-    //Check for error
+    //Procura se deu erro
     GLenum error = glGetError();
     if( error != GL_NO_ERROR )
     {
@@ -707,44 +701,10 @@ bool loadMedia()
     const int CHECKERBOARD_PIXEL_COUNT = CHECKERBOARD_WIDTH * CHECKERBOARD_HEIGHT;
     GLuint checkerBoard[ CHECKERBOARD_PIXEL_COUNT ];
 
-
-
-    //Checkerboard pixels
-/*    const int CHECKERBOARD_WIDTH = 128;
-    const int CHECKERBOARD_HEIGHT = 128;
-    const int CHECKERBOARD_PIXEL_COUNT = CHECKERBOARD_WIDTH * CHECKERBOARD_HEIGHT;
-    GLuint checkerBoard[ CHECKERBOARD_PIXEL_COUNT ];
-
-    //Go through pixels
-    for( int i = 0; i < CHECKERBOARD_PIXEL_COUNT; ++i )
-    {
-        //Get the individual color components
-        GLubyte* colors = (GLubyte*)&checkerBoard[ i ];
-
-        //If the 5th bit of the x and y offsets of the pixel do not match
-        if( i / 128 & 16 ^ i % 128 & 16 )
-        {
-            //Set pixel to white
-            colors[ 0 ] = 0xFF;
-            colors[ 1 ] = 0xFF;
-            colors[ 2 ] = 0xFF;
-            colors[ 3 ] = 0xFF;
-        }
-        else
-        {
-            //Set pixel to red
-            colors[ 0 ] = 0xFF;
-            colors[ 1 ] = 0x00;
-            colors[ 2 ] = 0x00;
-            colors[ 3 ] = 0xFF;
-        }
-    }
-
-    */
-    //Load texture
+    //Carrega textura
     if(! loadTextureFromPixels32( checkerBoard, CHECKERBOARD_WIDTH, CHECKERBOARD_HEIGHT ) )
     {
-		printf( "Unable to load checkerboard texture!\n" );
+		printf( "Nao foi possivel carregar checkerboard texture!\n" );
         return false;
     }
 
@@ -1367,11 +1327,14 @@ int l,i;
 glPushMatrix();
 glColor3f(1.0f,1.0f,1.0f);
 glTranslatef(0.0f,7.0f,25.0f);
-l=strlen( st ); // see how many characters are in text string.
-glRasterPos2i( x, y); // location to start printing text
-    for( i=0; i < l; i++) // loop until i is greater then l
+// Obtem a quantidade de caractees da string
+l=strlen( st );
+// Localiza uma coordenada para comecar a exibir o texto
+glRasterPos2i( x, y);
+    for( i=0; i < l; i++)
     {
-    glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, st[i]); // Print a character on the screen
+    // Vai exibindo os caracteres na tela
+    glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, st[i]);
     }
 glPopMatrix();
 }
@@ -1387,11 +1350,15 @@ int l,i;
 glPushMatrix();
 glColor3f(1.0f,0.0f,0.0f);
 glTranslatef(0.0f,7.0f,25.0f);
-l=strlen( st ); // see how many characters are in text string.
-glRasterPos2i( x, y); // location to start printing text
-    for( i=0; i < l; i++) // loop until i is greater then l
+// Obtem a quantidade de caractees da string
+l=strlen( st );
+
+// Localiza uma coordenada para comecar a exibir o texto
+glRasterPos2i( x, y);
+    for( i=0; i < l; i++)
     {
-    glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, st[i]); // Print a character on the screen
+    // Vai exibindo os caracteres na tela
+    glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, st[i]);
     }
 glPopMatrix();
 }
@@ -2057,10 +2024,10 @@ int main(int argc, char *argv[])
     glEnable(GL_TEXTURE_2D);
     glutReshapeFunc(resize);
 
-    //Load media
+    //Carrega a imagem
     if( !loadMedia() )
     {
-        printf( "Unable to load media!\n" );
+        printf( "Nao foi possivel carregar a imagem!\n" );
         return 2;
     }
 
