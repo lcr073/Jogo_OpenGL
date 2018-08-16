@@ -1652,7 +1652,13 @@ static void display(void)
     // Obtem o inicio da contagem
     tempo_clock = clock();
 
-    glClearColor(1,1,1,1);
+    // Define a cor da neblina
+    float fogColor[] = {0.9, 0.9, 0.9, 0.0};
+
+    // cor do fundo igual a neblina
+    glClearColor(fogColor[0], fogColor[1], fogColor[2], fogColor[3]);
+
+    //glClearColor(1,1,1,1);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
 
@@ -1667,8 +1673,18 @@ static void display(void)
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
+    // cor da neblina
+    glFogfv(GL_FOG_COLOR, fogColor);
+
+     glFogi(GL_FOG_MODE, GL_LINEAR);
+
+    glFogf(GL_FOG_START, 7.0);
+    glFogf(GL_FOG_END, 30.0);
+
+
     // Caso o personagem morreu
     if(ptosVida == 0){
+        glDisable(GL_FOG);
         PrintTxtTelaGameOver((20*(0.5*ScreenWidth)/ScreenWidth)-14,-4,"GAME OVER");
         PrintTxtTelaGameOver((20*(0.5*ScreenWidth)/ScreenWidth)-18,-6,"Seus erros consumiram todas as suas vidas,");
         PrintTxtTelaGameOver((20*(0.5*ScreenWidth)/ScreenWidth)-18,-7,"alem de sacrificar muitas estruturas boas !");
@@ -1684,6 +1700,7 @@ static void display(void)
     }
     // Caso ele ganhou a partida
     else if(ptosAcertos == 5){
+        glDisable(GL_FOG);
         PrintTxtTelaGameOver((20*(0.5*ScreenWidth)/ScreenWidth)-14,-4,"A CIDADE ESTA A SALVO !!!");
         PrintTxtTelaGameOver((20*(0.5*ScreenWidth)/ScreenWidth)-18,-6,"Parabens, sua determinacao conseguiu salvar a cidade,");
         PrintTxtTelaGameOver((20*(0.5*ScreenWidth)/ScreenWidth)-18,-7,"das estruturas das trevas.");
@@ -1699,6 +1716,9 @@ static void display(void)
 
     // Exibe instrucoes so por um determinado tempo
     if(tempoInstrucoes > 0.0){
+        // Desliga o fog nas instrucoes
+        glDisable(GL_FOG);
+
         if(tempoInstrucoes > 20.0){
             PrintTxtTela((20*(0.5*ScreenWidth)/ScreenWidth)-17,-7,"THE STONE RANGERS SIMULATOR");
             PrintTxtTela((20*(0.5*ScreenWidth)/ScreenWidth)-13,-10,"FPS Edition");
@@ -1734,6 +1754,9 @@ static void display(void)
 
         // Carrega um fundo preto
         apresentaInstrucoes();
+    }
+    else{
+        glEnable(GL_FOG);
     }
 
     // Desenha elementos do HUD
